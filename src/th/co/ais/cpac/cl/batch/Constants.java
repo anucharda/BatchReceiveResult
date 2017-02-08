@@ -30,6 +30,9 @@ public class Constants {
 	public static int inboundSuccessStatus = 4;
 	public static int inboundIncompleteStatus = 5;
 	public static int inboundFailStatus = 5;
+	public static int treatSuccessStatus = 4;
+	public static int treatIncompleteStatus = 5;
+	public static int treatFailStatus = 5;
 
 
 	public static DBConnectionPools getDBConnectionPools(UtilityLogger logger) {

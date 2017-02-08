@@ -38,34 +38,24 @@ public class CLOrder {
 		}
 	}
 
-	public class CLOrderInfo {
-		protected CLOrderInfo() {
+	public class CLOrderTreatementInfo {
+		protected CLOrderTreatementInfo() {
 		}
 
+		private BigDecimal treatementId;
 		private BigDecimal orderId;
+		private BigDecimal batchId;
 		private String baNumber;
 		private String mobileNumber;
-		private BigDecimal orderActionId;
-		private BigDecimal orderCriteriaId;
+		private int actStatus;
 
-		private String orderType;
-		private String orderReason;
-		private String suspendType;
+		public BigDecimal getTreatementId() {
+			return treatementId;
+		}
 
-		private String networkType;
-		private BigDecimal actionStatus;
-		private Date actionStatusDtm;
-		private String actionRemark;
-		private BigDecimal negoId;
-		private BigDecimal batchId;
-		private String sffOrderNumber;
-
-		private Character endRequestBoo;
-
-		private Date created;
-		private String createdBy;
-		private Date lastUpd;
-		private String lastUpdBy;
+		public void setTreatementId(BigDecimal treatementId) {
+			this.treatementId = treatementId;
+		}
 
 		public BigDecimal getOrderId() {
 			return orderId;
@@ -91,86 +81,6 @@ public class CLOrder {
 			this.mobileNumber = mobileNumber;
 		}
 
-		public BigDecimal getOrderActionId() {
-			return orderActionId;
-		}
-
-		public void setOrderActionId(BigDecimal orderActionId) {
-			this.orderActionId = orderActionId;
-		}
-
-		public BigDecimal getOrderCriteriaId() {
-			return orderCriteriaId;
-		}
-
-		public void setOrderCriteriaId(BigDecimal orderCriteriaId) {
-			this.orderCriteriaId = orderCriteriaId;
-		}
-
-		public String getOrderType() {
-			return orderType;
-		}
-
-		public void setOrderType(String orderType) {
-			this.orderType = orderType;
-		}
-
-		public String getOrderReason() {
-			return orderReason;
-		}
-
-		public void setOrderReason(String orderReason) {
-			this.orderReason = orderReason;
-		}
-
-		public String getSuspendType() {
-			return suspendType;
-		}
-
-		public void setSuspendType(String suspendType) {
-			this.suspendType = suspendType;
-		}
-
-		public String getNetworkType() {
-			return networkType;
-		}
-
-		public void setNetworkType(String networkType) {
-			this.networkType = networkType;
-		}
-
-		public BigDecimal getActionStatus() {
-			return actionStatus;
-		}
-
-		public void setActionStatus(BigDecimal actionStatus) {
-			this.actionStatus = actionStatus;
-		}
-
-		public Date getActionStatusDtm() {
-			return actionStatusDtm;
-		}
-
-		public void setActionStatusDtm(Date actionStatusDtm) {
-			this.actionStatusDtm = actionStatusDtm;
-		}
-
-		public String getActionRemark() {
-			return actionRemark;
-		}
-
-		public void setActionRemark(String actionRemark) {
-			this.actionRemark = actionRemark;
-		}
-
-		public BigDecimal getNegoId() {
-			return negoId;
-		}
-
-		public void setNegoId(BigDecimal negoId) {
-			this.negoId = negoId;
-		}
-
 		public BigDecimal getBatchId() {
 			return batchId;
 		}
@@ -179,71 +89,31 @@ public class CLOrder {
 			this.batchId = batchId;
 		}
 
-		public String getSffOrderNumber() {
-			return sffOrderNumber;
+		public int getActStatus() {
+			return actStatus;
 		}
 
-		public void setSffOrderNumber(String sffOrderNumber) {
-			this.sffOrderNumber = sffOrderNumber;
-		}
-
-		public Date getCreated() {
-			return created;
-		}
-
-		public void setCreated(Date created) {
-			this.created = created;
-		}
-
-		public String getCreatedBy() {
-			return createdBy;
-		}
-
-		public void setCreatedBy(String createdBy) {
-			this.createdBy = createdBy;
-		}
-
-		public Date getLastUpd() {
-			return lastUpd;
-		}
-
-		public void setLastUpd(Date lastUpd) {
-			this.lastUpd = lastUpd;
-		}
-
-		public String getLastUpdBy() {
-			return lastUpdBy;
-		}
-
-		public void setLastUpdBy(String lastUpdBy) {
-			this.lastUpdBy = lastUpdBy;
-		}
-
-		public Character getEndRequestBoo() {
-			return endRequestBoo;
-		}
-
-		public void setEndRequestBoo(Character endRequestBoo) {
-			this.endRequestBoo = endRequestBoo;
+		public void setActStatus(int actStatus) {
+			this.actStatus = actStatus;
 		}
 
 	}
 
-	public class CLOrderInfoResponse extends DBTemplatesResponse<ArrayList<CLOrderInfo>> {
+	public class CLOrderInfoResponse extends DBTemplatesResponse<ArrayList<CLOrderTreatementInfo>> {
 
 		@Override
-		protected ArrayList<CLOrderInfo> createResponse() {
+		protected ArrayList<CLOrderTreatementInfo> createResponse() {
 			return new ArrayList<>();
 		}
 
 	}
 
-	protected class GetOrderInfoByMobileAndAction
+	protected class GetOrderTreatementInfoByMobileAndAction
 			extends DBTemplatesExecuteQuery<CLOrderInfoResponse, UtilityLogger, DBConnectionPools> {
 		private String mobileNo;
 		private int orderActionID;
 
-		public GetOrderInfoByMobileAndAction(UtilityLogger logger) {
+		public GetOrderTreatementInfoByMobileAndAction(UtilityLogger logger) {
 			super(logger);
 		}
 
@@ -256,8 +126,10 @@ public class CLOrder {
 		protected StringBuilder createSqlProcess() {
 			StringBuilder sql = new StringBuilder();
 			sql.append(" SELECT").append(Constants.END_LINE);
-			sql.append(" ORDER_ID,BA_NO ").append(Constants.END_LINE);
-			sql.append(" FROM CL_ORDER").append(Constants.END_LINE);
+			sql.append(" a.ORDER_ID,BA_NO,MOBILE_NO,TREATMENT_ID,BATCH_ID ").append(Constants.END_LINE);
+			sql.append(" FROM CL_ORDER_TREATMENT a ").append(Constants.END_LINE);
+			sql.append(" INNER JOIN dbo.CL_ORDER b ").append(Constants.END_LINE);
+			sql.append(" ON a.ORDER_ID=b.ORDER_ID ").append(Constants.END_LINE);
 			sql.append(" WHERE MOBILE_NO = ('").append(mobileNo).append("') ").append(Constants.END_LINE);
 			sql.append(" and ORDER_ACTION_ID = (").append(orderActionID).append(")").append(Constants.END_LINE);
 			sql.append(" and ACTION_STATUS = (").append(Constants.suspendInprogressStatus).append(")")
@@ -267,9 +139,12 @@ public class CLOrder {
 
 		@Override
 		protected void setReturnValue(ResultSet resultSet) throws SQLException {
-			CLOrderInfo temp = new CLOrderInfo();
+			CLOrderTreatementInfo temp = new CLOrderTreatementInfo();
 			temp.setBaNumber(resultSet.getString("BA_NO"));
 			temp.setOrderId(resultSet.getBigDecimal("ORDER_ID"));
+			temp.setMobileNumber(resultSet.getString("MOBILE_NO"));
+			temp.setTreatementId(resultSet.getBigDecimal("TREATMENT_ID"));
+			temp.setBatchId(resultSet.getBigDecimal("BATCH_ID"));
 			response.getResponse().add(temp);
 		}
 
@@ -280,9 +155,10 @@ public class CLOrder {
 		}
 	}
 
-	public CLOrderInfo getOrderInfo(String mobileNo, int orderActionID) {
-		CLOrderInfo orderInfo = null;
-		CLOrderInfoResponse response = new GetOrderInfoByMobileAndAction(logger).execute(mobileNo, orderActionID);
+	public CLOrderTreatementInfo getOrderTreatementInfo(String mobileNo, int orderActionID) {
+		CLOrderTreatementInfo orderInfo = null;
+		CLOrderInfoResponse response = new GetOrderTreatementInfoByMobileAndAction(logger).execute(mobileNo,
+				orderActionID);
 		if (response.getResponse() != null && response.getResponse().size() > 0) {
 			orderInfo = response.getResponse().get(0);
 		}
@@ -295,40 +171,95 @@ public class CLOrder {
 		String sffOrderNo;
 		String failReason;
 		String updateBy;
-	    public UpdateOrderStatus(UtilityLogger logger) {
-	      super(logger);
-	    }
 
-	    @Override
-	    protected StringBuilder createSqlProcess() {
-	      StringBuilder sql = new StringBuilder();
-	      sql.append("UPDATE dbo.CL_ORDER ").append(Constants.END_LINE);
-	      sql.append("SET LAST_UPD= getdate() , LAST_UPD_BY='").append(updateBy).append("'").append(Constants.END_LINE);
-	      sql.append(",ACTION_STATUS = ").append(actionStatus).append(Constants.END_LINE);	
-	      sql.append(", ACTION_STATUS_DTM = getdate() ").append(Constants.END_LINE);
-	      sql.append(",SFF_ORDER_NO = '").append(sffOrderNo).append("'").append(Constants.END_LINE);
-	      if (failReason != null) {
-	        sql.append(", ACTION_REMARK = '").append(failReason).append("'").append(Constants.END_LINE);
-	      }
-	      sql.append(" WHERE ORDER_ID = ").append(orderID).append(Constants.END_LINE);
-	      return sql;
-	    }
+		public UpdateOrderStatus(UtilityLogger logger) {
+			super(logger);
+		}
 
-	    @Override
-	    protected ExecuteResponse createResponse() {
-	      return new ExecuteResponse();
-	    }
+		@Override
+		protected StringBuilder createSqlProcess() {
+			StringBuilder sql = new StringBuilder();
+			sql.append("UPDATE dbo.CL_ORDER ").append(Constants.END_LINE);
+			sql.append("SET LAST_UPD= getdate() , LAST_UPD_BY='").append(updateBy).append("'")
+					.append(Constants.END_LINE);
+			sql.append(",ACTION_STATUS = ").append(actionStatus).append(Constants.END_LINE);
+			sql.append(", ACTION_STATUS_DTM = getdate() ").append(Constants.END_LINE);
+			sql.append(",SFF_ORDER_NO = '").append(sffOrderNo).append("'").append(Constants.END_LINE);
+			if (failReason != null) {
+				sql.append(", ACTION_REMARK = '").append(failReason).append("'").append(Constants.END_LINE);
+			}
+			sql.append(" WHERE ORDER_ID = ").append(orderID).append(Constants.END_LINE);
+			return sql;
+		}
 
-	    protected ExecuteResponse execute(BigDecimal orderID, int actionStatus, String sffOrderNo,String failReason,String updateBy) {
-	      this.orderID = orderID;
-	      this.actionStatus = actionStatus;
-	      this.sffOrderNo = sffOrderNo;
-	      this.updateBy = updateBy;
-	      return executeUpdate(Constants.getDBConnectionPools(logger), true); // case adjust false;
-	    }
+		@Override
+		protected ExecuteResponse createResponse() {
+			return new ExecuteResponse();
+		}
+
+		protected ExecuteResponse execute(BigDecimal orderID, int actionStatus, String sffOrderNo, String failReason,
+				String updateBy) {
+			this.orderID = orderID;
+			this.actionStatus = actionStatus;
+			this.sffOrderNo = sffOrderNo;
+			this.updateBy = updateBy;
+			return executeUpdate(Constants.getDBConnectionPools(logger), true); // case
+																				// adjust
+																				// false;
+		}
 	}
-    public ExecuteResponse updateOrderStatus(BigDecimal orderID, int actionStatus, String sffOrderNo,String failReason,String updateBy) {
-        return new UpdateOrderStatus(logger).execute(orderID,actionStatus,sffOrderNo,failReason,updateBy);
-    }
+
+	public ExecuteResponse updateOrderStatus(BigDecimal orderID, int actionStatus, String sffOrderNo, String failReason,
+			String updateBy) {
+		return new UpdateOrderStatus(logger).execute(orderID, actionStatus, sffOrderNo, failReason, updateBy);
+	}
+
+	protected class GetOrderTreatementInfoByTreatment
+			extends DBTemplatesExecuteQuery<CLOrderInfoResponse, UtilityLogger, DBConnectionPools> {
+	
+		private BigDecimal treatmentID;
+
+		public GetOrderTreatementInfoByTreatment(UtilityLogger logger) {
+			super(logger);
+		}
+
+		@Override
+		protected CLOrderInfoResponse createResponse() {
+			return new CLOrderInfoResponse();
+		}
+
+		@Override
+		protected StringBuilder createSqlProcess() {
+			StringBuilder sql = new StringBuilder();
+			sql.append(" SELECT").append(Constants.END_LINE);
+			sql.append(" TREATMENT_ID,MOBILE_NO,BA_NO,BATCH_ID ").append(Constants.END_LINE);
+			sql.append(" FROM CL_ORDER_TREATMENT a ").append(Constants.END_LINE);
+			sql.append(" INNER JOIN dbo.CL_ORDER b ").append(Constants.END_LINE);
+			sql.append(" ON a.ORDER_ID=b.ORDER_ID ").append(Constants.END_LINE);
+			sql.append(" WHERE ORDER_ACTION_ID = (").append(treatmentID).append(")").append(Constants.END_LINE);
+			return sql;
+		}
+
+		@Override
+		protected void setReturnValue(ResultSet resultSet) throws SQLException {
+			CLOrderTreatementInfo temp = new CLOrderTreatementInfo();
+			temp.setTreatementId(resultSet.getBigDecimal("TREATMENT_ID"));
+			temp.setMobileNumber(resultSet.getString("MOBILE_NO"));
+			temp.setBaNumber(resultSet.getString("BA_NO"));
+			temp.setBatchId(resultSet.getBigDecimal("BATCH_ID"));
+			response.getResponse().add(temp);
+		}
+
+		protected CLOrderInfoResponse execute(BigDecimal treatmentID) {
+			this.treatmentID = treatmentID;
+			return executeQuery(Constants.getDBConnectionPools(logger), true);
+		}
+	}
+	
+	public CLOrderInfoResponse getOrderTreatementInfoByTreatmentID(BigDecimal treatmentID) {
+		CLOrderInfoResponse orderList = null;
+		orderList = new GetOrderTreatementInfoByTreatment(logger).execute(treatmentID);
+		return orderList;
+	}
 
 }
