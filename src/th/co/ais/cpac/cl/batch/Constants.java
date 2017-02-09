@@ -17,19 +17,27 @@ public class Constants {
 
 	public static String dbPath = "c:\\cpac\\database.properties";
 
-	public static String suspendOrderType = "Suspend-Debt";
 	public static int suspendOrderActionID = 10;//dummy 
-	public static String terminateOrderType = "Disconnect-Terminate";
 	public static int terminateOrderActionID = 4;
-	
-	public static String reconnectType = "Reconnect-Debt";
 	public static int reconnectOrderID = 12;
 	public static String END_LINE = "";
-
-	public static int suspendInprogressStatus = 3;
-	public static int inboundSuccessStatus = 4;
-	public static int inboundIncompleteStatus = 5;
-	public static int inboundFailStatus = 5;
+	
+	public static String suspendJobType="S";
+	public static String terminateJobType="T";
+	public static String reconnectJobType="R";
+	
+	public static int batchInprogressStatus = 1;
+	public static int batchReceiveStatus = 2;
+	public static int batchCompleteStatus = 3;
+	
+	public static String suspendUsername = "Suspend User";
+	public static String terminateUsername = "Terminate User";
+	public static String reconnectUsername = "Reconnect User";
+	
+	public static int actInprogressStatus = 3;
+	public static int actSuccessStatus = 4;
+	public static int actIncompleteStatus = 5;
+	public static int actFailStatus = 5;
 	public static int treatSuccessStatus = 4;
 	public static int treatIncompleteStatus = 5;
 	public static int treatFailStatus = 5;

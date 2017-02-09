@@ -111,8 +111,8 @@ public class CLOrder {
 	protected class GetOrderTreatementInfoByMobileAndAction
 			extends DBTemplatesExecuteQuery<CLOrderInfoResponse, UtilityLogger, DBConnectionPools> {
 		private String mobileNo;
-		private int orderActionID;
-
+		private int actStatus;
+		private BigDecimal batchID;
 		public GetOrderTreatementInfoByMobileAndAction(UtilityLogger logger) {
 			super(logger);
 		}
@@ -131,9 +131,8 @@ public class CLOrder {
 			sql.append(" INNER JOIN dbo.CL_ORDER b ").append(Constants.END_LINE);
 			sql.append(" ON a.ORDER_ID=b.ORDER_ID ").append(Constants.END_LINE);
 			sql.append(" WHERE MOBILE_NO = ('").append(mobileNo).append("') ").append(Constants.END_LINE);
-			sql.append(" and ORDER_ACTION_ID = (").append(orderActionID).append(")").append(Constants.END_LINE);
-			sql.append(" and ACTION_STATUS = (").append(Constants.suspendInprogressStatus).append(")")
-					.append(Constants.END_LINE);
+			sql.append(" and ACTION_STATUS = (").append(actStatus).append(")").append(Constants.END_LINE);
+			sql.append(" and BATCH_ID = (").append(batchID).append(")").append(Constants.END_LINE);
 			return sql;
 		}
 
@@ -144,33 +143,35 @@ public class CLOrder {
 			temp.setOrderId(resultSet.getBigDecimal("ORDER_ID"));
 			temp.setMobileNumber(resultSet.getString("MOBILE_NO"));
 			temp.setTreatementId(resultSet.getBigDecimal("TREATMENT_ID"));
-			temp.setBatchId(resultSet.getBigDecimal("BATCH_ID"));
 			response.getResponse().add(temp);
 		}
 
-		protected CLOrderInfoResponse execute(String mobileNo, int orderActionID) {
+		protected CLOrderInfoResponse execute(String mobileNo,BigDecimal batchID, int actStatus) {
 			this.mobileNo = mobileNo;
-			this.orderActionID = orderActionID;
+			this.actStatus=actStatus;
+			this.batchID=batchID;
 			return executeQuery(Constants.getDBConnectionPools(logger), true);
 		}
 	}
 
-	public CLOrderTreatementInfo getOrderTreatementInfo(String mobileNo, int orderActionID) {
+	public CLOrderTreatementInfo getOrderTreatementInfo(String mobileNo,BigDecimal batchID, int actStatus) {
 		CLOrderTreatementInfo orderInfo = null;
-		CLOrderInfoResponse response = new GetOrderTreatementInfoByMobileAndAction(logger).execute(mobileNo,
-				orderActionID);
+		CLOrderInfoResponse response = new GetOrderTreatementInfoByMobileAndAction(logger).execute(mobileNo,batchID,actStatus);
 		if (response.getResponse() != null && response.getResponse().size() > 0) {
 			orderInfo = response.getResponse().get(0);
+		}else{
+			return null;
 		}
 		return orderInfo;
 	}
 
 	protected class UpdateOrderStatus extends DBTemplatesUpdate<ExecuteResponse, UtilityLogger, DBConnectionPools> {
-		BigDecimal orderID;
+		String mobileNo;
 		int actionStatus;
 		String sffOrderNo;
 		String failReason;
 		String updateBy;
+		BigDecimal batchID;
 
 		public UpdateOrderStatus(UtilityLogger logger) {
 			super(logger);
@@ -188,7 +189,9 @@ public class CLOrder {
 			if (failReason != null) {
 				sql.append(", ACTION_REMARK = '").append(failReason).append("'").append(Constants.END_LINE);
 			}
-			sql.append(" WHERE ORDER_ID = ").append(orderID).append(Constants.END_LINE);
+			sql.append(" WHERE MOBILE_NO  = '").append(mobileNo).append("'").append(Constants.END_LINE);
+			sql.append(" AND BATCH_ID  = ").append(batchID).append(Constants.END_LINE);
+			sql.append(" AND ACTION_STATUS  = ").append(Constants.actInprogressStatus).append(Constants.END_LINE);
 			return sql;
 		}
 
@@ -197,11 +200,12 @@ public class CLOrder {
 			return new ExecuteResponse();
 		}
 
-		protected ExecuteResponse execute(BigDecimal orderID, int actionStatus, String sffOrderNo, String failReason,
-				String updateBy) {
-			this.orderID = orderID;
+		protected ExecuteResponse execute(String mobileNo,BigDecimal batchID, int actionStatus, String sffOrderNo, String failReason,String updateBy) {
+			this.mobileNo = mobileNo;
+			this.batchID=batchID;
 			this.actionStatus = actionStatus;
 			this.sffOrderNo = sffOrderNo;
+			this.failReason=failReason;
 			this.updateBy = updateBy;
 			return executeUpdate(Constants.getDBConnectionPools(logger), true); // case
 																				// adjust
@@ -209,9 +213,8 @@ public class CLOrder {
 		}
 	}
 
-	public ExecuteResponse updateOrderStatus(BigDecimal orderID, int actionStatus, String sffOrderNo, String failReason,
-			String updateBy) {
-		return new UpdateOrderStatus(logger).execute(orderID, actionStatus, sffOrderNo, failReason, updateBy);
+	public ExecuteResponse updateOrderStatus(String mobileNo,BigDecimal batchID, int actionStatus, String sffOrderNo, String failReason,String updateBy) {
+		return new UpdateOrderStatus(logger).execute(mobileNo,batchID, actionStatus, sffOrderNo, failReason, updateBy);
 	}
 
 	protected class GetOrderTreatementInfoByTreatment
@@ -236,7 +239,7 @@ public class CLOrder {
 			sql.append(" FROM CL_ORDER_TREATMENT a ").append(Constants.END_LINE);
 			sql.append(" INNER JOIN dbo.CL_ORDER b ").append(Constants.END_LINE);
 			sql.append(" ON a.ORDER_ID=b.ORDER_ID ").append(Constants.END_LINE);
-			sql.append(" WHERE ORDER_ACTION_ID = (").append(treatmentID).append(")").append(Constants.END_LINE);
+			sql.append(" WHERE TREATMENT_ID = (").append(treatmentID).append(")").append(Constants.END_LINE);
 			return sql;
 		}
 
