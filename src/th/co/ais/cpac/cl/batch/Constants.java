@@ -40,7 +40,10 @@ public class Constants {
 	public static int actFailStatus = 5;
 	public static int treatSuccessStatus = 4;
 	public static int treatIncompleteStatus = 5;
-	public static int treatFailStatus = 5;
+	public static int treatFailStatus = 6;
+	public static String PIPE ="\\|";
+	public static String sffOKExt =".ok";
+	public static String sffErrExt =".err";
 
 
 	public static DBConnectionPools getDBConnectionPools(UtilityLogger logger) {
