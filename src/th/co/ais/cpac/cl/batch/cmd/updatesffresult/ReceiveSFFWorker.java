@@ -17,12 +17,12 @@ public class ReceiveSFFWorker {
 	}
 	
 	public static void execute(Context context,String jobType,String syncFileName){
-		 context.getLogger().info("Start ReceiveSFFWorker Execute....");
+		 context.getLogger().info("Start UpdateSFFResultProcess Execute....");
 		 //Check จากชื่อไฟล์ว่าเป็น batch suspense/reconnect/terminate
 		
 		 context.getLogger().info("Trigger Update SSF Result Process....");
 		 new UpdateSFFResultProcess().executeProcess(context,jobType,syncFileName); ///?????????????????
-		 context.getLogger().info("End ReceiveSFFWorker Execute....");
+		 context.getLogger().info("End UpdateSFFResultProcess Execute....");
 	}
 	
 

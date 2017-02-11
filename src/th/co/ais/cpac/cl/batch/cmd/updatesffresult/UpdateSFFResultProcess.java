@@ -12,6 +12,7 @@ import th.co.ais.cpac.cl.batch.db.CLOrder.CLOrderInfoResponse;
 import th.co.ais.cpac.cl.batch.db.CLOrder.CLOrderTreatementInfo;
 import th.co.ais.cpac.cl.batch.db.CLTreatment;
 import th.co.ais.cpac.cl.batch.template.ProcessTemplate;
+import th.co.ais.cpac.cl.batch.util.Utility;
 import th.co.ais.cpac.cl.batch.util.ValidateUtil;
 import th.co.ais.cpac.cl.common.Context;
 
@@ -19,12 +20,14 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 	@Override
 	protected String getPathDatabase() {
 		// TODO Auto-generated method stub
-		return "C:\\cpac\\database.properties";
+		return Constants.cldbConfPath;
 	}
 
 	public void executeProcess(Context context, String jobType, String syncFileName) { // suspendJobType=S,terminateJobType=T,reconnectJobType=R
+		context.getLogger().info("Start UpdateSFFResultProcess.executeProcess");
 		execute();
 		readFile(context, jobType, syncFileName);
+		context.getLogger().info("End UpdateSFFResultProcess.executeProcess");
 	}
 
 	public void readFile(Context context, String jobType, String syncFileName) {
@@ -34,9 +37,9 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 		HashMap<BigDecimal, String> treatmentIDlist = null;
 
 		try {
-			context.getLogger().info("Start WorkerReceive....");
-			context.getLogger().info("jobType->" + syncFileName);
-			context.getLogger().info("SyncFileName->" + getJobName(jobType));
+			context.getLogger().info("Start UpdateSFFResultProcess.readFile");
+			context.getLogger().info("jobType->" +  Utility.getJobName(jobType));
+			context.getLogger().info("SyncFileName->" + syncFileName);
 
 			if (Constants.suspendJobType.equals(jobType) || Constants.terminateJobType.equals(jobType)
 					|| Constants.reconnectJobType.equals(jobType)) {
@@ -48,7 +51,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 				String batchFileName = "";
 				String[] syncResult = new String[2]; // ?????????????????อ่านจากไฟล์	// Sync
 				BigDecimal batchID = null;
-				String username = getusername(jobType);
+				String username = Utility.getusername(jobType);
 				int syncFileSize = 0;
 				
 				// 2. อ่านชื่อไฟล์จากไฟล์ .sync
@@ -140,7 +143,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 														+ dataContent);
 											}
 										}
-										request.setActionID(getActionID(jobType));
+										request.setActionID(Utility.getActionID(jobType));
 										request.setBatchID(batchID);
 										// 4.1.Update CL_ORDER to Success/Fail
 										CLOrderTreatementInfo orderInfo = updateOrder(request, context, username);
@@ -148,8 +151,10 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 											treatmentIDlist.put(orderInfo.getTreatementId(), "");
 										}
 										recordNum++;
-									} else {
-										throw new Exception("Wrong record type :" + dataContent);
+									} else if (dataContent.indexOf("09|") != -1) {
+										context.getLogger().info("Footer Data : "+dataContent);
+									}else {
+										context.getLogger().info("Wrong record type : "+dataContent);
 									}
 								} else {
 									throw new Exception("Not Found |:" + dataContent);
@@ -210,43 +215,12 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 				batchDB.updateInboundCompleteStatus(batchID, username);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			context.getLogger().info("Error->"+e.getMessage()+": "+e.getCause().toString());
 		} finally {
-
-		}
-		context.getLogger().debug("End Read File....");
-	}
-
-	private String getJobName(String jobType) {
-		if (Constants.suspendJobType.equals(jobType)) {
-			return "Suspend Job";
-		} else if (Constants.terminateJobType.equals(jobType)) {
-			return "Terminate Job";
-		} else if (Constants.reconnectJobType.equals(jobType)) {
-			return "Reconnect Job";
-		} else {
-			return "Other Job Undefine";
-		}
-	}
-	private int getActionID(String jobType) {
-		if (Constants.suspendJobType.equals(jobType)) {
-			return Constants.suspendOrderActionID;
-		} else if (Constants.terminateJobType.equals(jobType)) {
-			return Constants.terminateOrderActionID;
-		} else {
-			return Constants.reconnectOrderID;
+			context.getLogger().info("End UpdateSFFResultProcess.readFile");
 		}
 	}
 
-	private String getusername(String jobType) {
-		if (Constants.suspendJobType.equals(jobType)) {
-			return Constants.suspendUsername;
-		} else if (Constants.terminateJobType.equals(jobType)) {
-			return Constants.terminateUsername;
-		} else {
-			return Constants.reconnectUsername;
-		}
-	}
 
 	public CLOrderTreatementInfo updateOrder(UpdateResultSSFBean request, Context context, String username) {
 		/**********************
