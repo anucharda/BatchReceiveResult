@@ -200,7 +200,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 
 							/* Update Treatment */
 							CLTreatment treatmentDB = new CLTreatment(context.getLogger());
-							treatmentDB.updateTreatmentReceive(treatResult, key, username);
+							treatmentDB.updateTreatmentReceive(treatResult, key, username,"");
 						} else {
 							context.getLogger().info("not found treatment");
 						}
@@ -236,14 +236,10 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 			tbl.updateOrderStatus(request.getMobileNo(), request.getBatchID(), request.getActionStatus(),
 					request.getSffOrderNo(), request.getFailReason(), username);
 		} else {
-			System.out.println("no orderInfo -> " + request.toString());
+			context.getLogger().info("no orderInfo -> " + request.toString());
 		}
 		return orderInfo;
 	}
 
-	public CLOrderTreatementInfo updateSuspendOrderFail(UpdateResultSSFBean request, Context context) {
-		CLOrderTreatementInfo orderInfo = null;
-		return orderInfo;
-	}
 
 }

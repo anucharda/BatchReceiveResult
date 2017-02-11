@@ -100,7 +100,7 @@ public class PMBatchAdjDtl {
 			this.invoiceID = invoiceID;
 			this.amount=amount;
 			this.adjStatus=adjStatus;
-			return executeQuery(Constants.getPMDBConnectionPools(logger), true);
+			return executeQuery(Constants.getDBConnectionPools(logger), true);
 		}
 	}
 

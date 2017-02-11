@@ -6,7 +6,6 @@
 package th.co.ais.cpac.cl.batch;
 
 import th.co.ais.cpac.cl.batch.cnf.CNFDatabase;
-import th.co.ais.cpac.cl.batch.cnf.PMDatabase;
 import th.co.ais.cpac.cl.common.UtilityLogger;
 import th.co.ais.cpac.cl.template.database.DBConnectionPools;
 
@@ -44,6 +43,7 @@ public class Constants {
 	public static int actSuccessStatus = 4;
 	public static int actIncompleteStatus = 5;
 	public static int actFailStatus = 6;
+	public static int treatProgressStatus = 3;
 	public static int treatSuccessStatus = 4;
 	public static int treatIncompleteStatus = 5;
 	public static int treatFailStatus = 6;
@@ -52,7 +52,8 @@ public class Constants {
 	public static String PIPE ="\\|";
 	public static String sffOKExt =".ok";
 	public static String sffErrExt =".err";
-	
+	public static String writeOffSuccess ="S";
+	public static String writeOffFail ="E";
 	public static String cldbConfPath ="C:\\cpac\\database.properties";
 	public static String pmdbConfPath ="C:\\cpac\\pmDatabase.properties";
 
@@ -60,8 +61,5 @@ public class Constants {
 		CNFDatabase cnf = new CNFDatabase();
 		return new DBConnectionPools<>(cnf, logger);
 	}
-	public static DBConnectionPools getPMDBConnectionPools(UtilityLogger logger) {
-		PMDatabase cnf = new PMDatabase();
-		return new DBConnectionPools<>(cnf, logger);
-	}
+	
 }

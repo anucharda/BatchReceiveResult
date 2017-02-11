@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import th.co.ais.cpac.cl.batch.Constants;
 import th.co.ais.cpac.cl.batch.db.CLBatch.ExecuteResponse;
 import th.co.ais.cpac.cl.batch.db.CLBatch.UpdateBatchReceiveAction;
+import th.co.ais.cpac.cl.batch.util.ValidateUtil;
 import th.co.ais.cpac.cl.common.UtilityLogger;
 import th.co.ais.cpac.cl.template.database.DBConnectionPools;
 import th.co.ais.cpac.cl.template.database.DBTemplatesResponse;
@@ -34,6 +35,7 @@ public class CLTreatment {
 		private int actStatus;
 		private BigDecimal treatmentID;
 		private String username;
+		private String failReason;
 
 		public UpdateTreatmentReceiveAction(UtilityLogger logger) {
 			super(logger);
@@ -51,21 +53,26 @@ public class CLTreatment {
 			sql.append("SET LAST_UPD= getdate() , LAST_UPD_BY='").append(username).append("'").append(Constants.END_LINE);
 			sql.append(",ACTION_STATUS = ").append(actStatus).append(Constants.END_LINE);
 			sql.append(", ACTION_STATUS_DTM  = getdate() ").append(Constants.END_LINE);
+			if(!ValidateUtil.isNull(failReason)){
+				sql.append(", ACTION_REMARK   ='").append(failReason).append("'").append(Constants.END_LINE);
+			}
 			sql.append(" WHERE TREATMENT_ID  = ").append(treatmentID).append(Constants.END_LINE);
+			sql.append(" AND ACTION_STATUS   = ").append(Constants.treatProgressStatus).append(Constants.END_LINE);
 			return sql;
 		}
 
 
-		protected ExecuteResponse execute(int actStatus,  BigDecimal treatmentID,String username) {
+		protected ExecuteResponse execute(int actStatus,  BigDecimal treatmentID,String username,String failReason) {
 			this.actStatus = actStatus;
 			this.treatmentID = treatmentID;
 			this.username = username;
+			this.failReason=failReason;
 			return executeUpdate(Constants.getDBConnectionPools(logger), true);
 		}
 	}
 
-	public ExecuteResponse updateTreatmentReceive(int actStatus,  BigDecimal treatmentID,String username) {
-		return new UpdateTreatmentReceiveAction(logger).execute(actStatus, treatmentID,username);
+	public ExecuteResponse updateTreatmentReceive(int actStatus,  BigDecimal treatmentID,String username,String failReason) {
+		return new UpdateTreatmentReceiveAction(logger).execute(actStatus, treatmentID,username,failReason);
 	}
 
 }

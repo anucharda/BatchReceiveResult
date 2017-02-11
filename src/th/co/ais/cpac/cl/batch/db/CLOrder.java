@@ -235,7 +235,7 @@ public class CLOrder {
 		protected StringBuilder createSqlProcess() {
 			StringBuilder sql = new StringBuilder();
 			sql.append(" SELECT").append(Constants.END_LINE);
-			sql.append(" TREATMENT_ID,MOBILE_NO,BA_NO,BATCH_ID ").append(Constants.END_LINE);
+			sql.append(" TREATMENT_ID,MOBILE_NO,BA_NO,BATCH_ID,ACTION_STATUS ").append(Constants.END_LINE);
 			sql.append(" FROM CL_ORDER_TREATMENT a ").append(Constants.END_LINE);
 			sql.append(" INNER JOIN dbo.CL_ORDER b ").append(Constants.END_LINE);
 			sql.append(" ON a.ORDER_ID=b.ORDER_ID ").append(Constants.END_LINE);
@@ -250,6 +250,7 @@ public class CLOrder {
 			temp.setMobileNumber(resultSet.getString("MOBILE_NO"));
 			temp.setBaNumber(resultSet.getString("BA_NO"));
 			temp.setBatchId(resultSet.getBigDecimal("BATCH_ID"));
+			temp.setActStatus(resultSet.getInt("ACTION_STATUS"));
 			response.getResponse().add(temp);
 		}
 
