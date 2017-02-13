@@ -1,8 +1,6 @@
 package th.co.ais.cpac.cl.batch.cmd.updatesffresult;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 
 import th.co.ais.cpac.cl.batch.Constants;
 import th.co.ais.cpac.cl.batch.util.FileUtil;
