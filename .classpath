@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre1.8.0_112"/>
-	<classpathentry kind="lib" path="/UTILITY_CPAC_COLLECTION_COMMON/dist/cpac_collection_common.jar" sourcepath="/UTILITY_CPAC_COLLECTION_COMMON"/>
-	<classpathentry kind="lib" path="C:/Source Code/new cpac/UTILITY_CPAC_COLLECTION_BATCHS/dist/cpac_collection_batchs.jar" sourcepath="/UTILITY_CPAC_COLLECTION_BATCHS"/>
-	<classpathentry kind="lib" path="/UTILITY_CPAC_COLLECTION_COMMON/lib/log4j-1.2.17.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/UTILITY_CPAC_COLLECTION_COMMON/lib/commons-dbcp2-2.1.1.jar"/>
 	<classpathentry kind="lib" path="/UTILITY_CPAC_COLLECTION_COMMON/lib/commons-pool2-2.2.jar"/>
 	<classpathentry kind="lib" path="/UTILITY_CPAC_COLLECTION_COMMON/lib/jconn4.jar"/>
-	<classpathentry kind="lib" path="/__JBOSS_DATA_GRID/lib/commons-pool-1.6.0.redhat-7.jar"/>
-	<classpathentry kind="lib" path="/__JBOSS_DATA_GRID/lib/jgroups-3.6.3.Final-redhat-3.jar"/>
+	<classpathentry kind="lib" path="/UTILITY_CPAC_COLLECTION_COMMON/lib/log4j-1.2.17.jar"/>
 	<classpathentry kind="lib" path="/BatchTreatment/lib/commons-dbcp2-2.1.1.jar"/>
 	<classpathentry kind="lib" path="/BatchTreatment/lib/commons-logging-1.1.3.jar"/>
 	<classpathentry kind="lib" path="/BatchTreatment/lib/commons-pool2-2.2.jar"/>
@@ -19,5 +15,9 @@
 	<classpathentry kind="lib" path="/BatchTreatment/lib/log4j-1.1.3.jar"/>
 	<classpathentry kind="lib" path="/BatchTreatment/lib/log4j-1.2.17.jar"/>
 	<classpathentry kind="lib" path="/BatchTreatment/lib/log4j-jboss-logmanager-1.1.1.Final-redhat-1.jar"/>
+	<classpathentry kind="lib" path="/BatchTreatment/dist/BatchTreatment.jar"/>
+	<classpathentry kind="lib" path="/UTILITY_CPAC_COLLECTION_BATCHS/dist/cpac_collection_batchs.jar"/>
+	<classpathentry kind="lib" path="/UTILITY_CPAC_COLLECTION_COMMON/dist/cpac_collection_common.jar" sourcepath="/UTILITY_CPAC_COLLECTION_COMMON"/>
+	<classpathentry kind="lib" path="lib/commons-io-1.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

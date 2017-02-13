@@ -3,6 +3,10 @@
 	<name>BatchReceiveResult</name>
 	<comment></comment>
 	<projects>
+		<project>BatchTreatment</project>
+		<project>RemoteSystemsTempFiles</project>
+		<project>UTILITY_CPAC_COLLECTION_BATCHS</project>
+		<project>UTILITY_CPAC_COLLECTION_COMMON</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
