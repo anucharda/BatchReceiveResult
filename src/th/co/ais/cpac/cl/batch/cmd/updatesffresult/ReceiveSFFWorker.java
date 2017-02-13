@@ -1,6 +1,8 @@
 package th.co.ais.cpac.cl.batch.cmd.updatesffresult;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 
 import th.co.ais.cpac.cl.batch.Constants;
 import th.co.ais.cpac.cl.batch.util.FileUtil;
@@ -21,24 +23,28 @@ public class ReceiveSFFWorker {
 			String jobType=args[0];//From Parameter
 		
 			//Find sync file on path.
-			String inboundPath="" ;
+			String inboundSyncPath="" ;
+			String inboundDataPath="" ;
 			String processPath="";
 			boolean doProcess=true;
 			if(Constants.suspendJobType.equals(jobType)){
-				inboundPath= reader.get("suspend.inboundPath");
+				inboundSyncPath= reader.get("suspend.inboundSyncPath");
+				inboundDataPath =reader.get("suspend.inboundDataPath");
 				processPath = reader.get("suspend.processPath");
 			}else if(Constants.terminateJobType.equals(jobType)){
-				inboundPath= reader.get("terminate.inboundPath");
+				inboundSyncPath= reader.get("terminate.inboundSyncPath");
+				inboundDataPath= reader.get("terminate.inboundDataPath");
 				processPath = reader.get("terminate.processPath");
 			}else if(Constants.reconnectJobType.equals(jobType)){
-				inboundPath= reader.get("reconnect.inboundPath");
+				inboundSyncPath= reader.get("reconnect.inboundSyncPath");
+				inboundDataPath= reader.get("reconnect.inboundDataPath");
 				processPath = reader.get("reconnect.processPath");
 			}else{
 				doProcess=false;
 				context.getLogger().info("not found job type : "+jobType);
 			}
 			if(doProcess){
-				File[] files = FileUtil.getAllFilesThatMatchFilenameExtensionAscendingOrder(inboundPath, "sync");
+				File[] files = FileUtil.getAllFilesThatMatchFilenameExtensionAscendingOrder(inboundSyncPath, "sync");
 				context.getLogger().info("Sync file size --> "+files.length);
 				String syncFileName = "";
 				if(files!=null && files.length>0){
@@ -51,7 +57,7 @@ public class ReceiveSFFWorker {
 						String[] fileNames = sb.toString().split("\\|");
 						//Loop for copy file from inbound to process directory.
 						for(int i=0; i<fileNames.length; i++){
-							File source = new File(inboundPath+"/"+fileNames[i]);
+							File source = new File(inboundDataPath+"/"+fileNames[i]);
 							if(source.exists()){
 								File dest = new File(processPath+"/"+fileNames[i]);
 								FileUtil.copyFile(source, dest);
@@ -78,12 +84,12 @@ public class ReceiveSFFWorker {
 							throw new Exception("Error occur delete file from inbound directory --> "+sourceSyncFile.getParent());
 						}
 						
-						execute(context, jobType, destSyncFile.getPath());
+						execute(context, jobType, destSyncFile.getPath(),inboundDataPath);
 					}else{
 						context.getLogger().info("Not found content in sync file --> "+syncFile);
 					}
 				}else{
-					context.getLogger().info("Not found sync file in directory --> "+inboundPath);
+					context.getLogger().info("Not found sync file in directory --> "+inboundSyncPath);
 				}
 			}
 
@@ -94,10 +100,10 @@ public class ReceiveSFFWorker {
 		}
 	}
 	
-	public static void execute(Context context,String jobType,String syncFileName){
+	public static void execute(Context context,String jobType,String syncFileName,String inboundDataPath){
 		 context.getLogger().info("Start UpdateSFFResultProcess Execute....");
 		 context.getLogger().info("Trigger Update SSF Result Process....");
-		 new UpdateSFFResultProcess().executeProcess(context,jobType,syncFileName); ///?????????????????
+		 new UpdateSFFResultProcess().executeProcess(context,jobType,syncFileName,inboundDataPath); ///?????????????????
 		 context.getLogger().info("End UpdateSFFResultProcess Execute....");
 	}
 	

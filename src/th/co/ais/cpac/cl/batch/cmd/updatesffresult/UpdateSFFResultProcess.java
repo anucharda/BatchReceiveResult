@@ -26,14 +26,14 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 		return Constants.cldbConfPath;
 	}
 
-	public void executeProcess(Context context, String jobType, String syncFileName) { // suspendJobType=S,terminateJobType=T,reconnectJobType=R
+	public void executeProcess(Context context, String jobType, String syncFile,String dataPath) { // suspendJobType=S,terminateJobType=T,reconnectJobType=R
 		context.getLogger().info("Start UpdateSFFResultProcess.executeProcess");
 		execute();
-		readFile(context, jobType, syncFileName);
+		readFile(context, jobType, syncFile,dataPath);
 		context.getLogger().info("End UpdateSFFResultProcess.executeProcess");
 	}
 
-	public void readFile(Context context, String jobType, String syncFile) {
+	public void readFile(Context context, String jobType, String syncFile,String dataPath) {
 		// อ่าน file ทีละ record
 		// เช็คว่า record แรกของไฟล์เป็น order type ไหน
 		// จบไฟล์ค่อย update treatement โดย grouping ตาม BA,update batch ต่อ
@@ -74,7 +74,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 				treatmentIDlist = new HashMap<BigDecimal, String>();
 				boolean firstFile = false;
 				for (int j = 0; j < syncResult.length; j++) { // for loop file
-					String filePath = syncResult[j];
+					String filePath = dataPath +"/"+syncResult[j];
 					boolean successFile = false;
 					if (Constants.sffOKExt.indexOf(filePath) != 1) {// 5. Check
 						successFile = true;
