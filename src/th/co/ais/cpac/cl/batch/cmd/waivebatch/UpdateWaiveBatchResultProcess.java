@@ -1,6 +1,8 @@
 package th.co.ais.cpac.cl.batch.cmd.waivebatch;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.math.BigDecimal;
 import java.util.HashMap;
 
@@ -33,16 +35,15 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 		return Constants.cldbConfPath;
 	}
 
-	public void executeProcess(Context context, String syncFileName) { // suspendJobType=S,terminateJobType=T,reconnectJobType=R
+	public void executeProcess(Context context, String processPath,String syncFileName,String inboundFileName) { // suspendJobType=S,terminateJobType=T,reconnectJobType=R
 		execute();
-		readFile(context, syncFileName);
+		readFile(context, processPath,syncFileName,inboundFileName);
 	}
 
-	public void readFile(Context context, String syncFileName) {
+	public void readFile(Context context,String processPath,String syncFileName,String inboundFileName) {
 		// อ่าน file ทีละ record
 		// เช็คว่า record แรกของไฟล์เป็น order type ไหน
 		// จบไฟล์ค่อย update treatement โดย grouping ตาม BA,update batch ต่อ
-		
 
 		try {
 			context.getLogger().info("Start WorkerReceive....");
@@ -50,81 +51,91 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 			context.getLogger().info("SyncFileName->" + syncFileName);
 			/***** START LOOP ******/
 			// 1.Rename file.sync to .dat
-			String fileDatExtName = syncFileName.replace(".sync", ".dat");
+
 			BigDecimal batchID = null;
 			// 2. Find Batch ID by fileDatExtName
 			CLBatch batchDB = new CLBatch(context.getLogger());
-			CLBatchInfo result = batchDB.getBatchInfoByFileName(Constants.batchInprogressStatus, fileDatExtName);
+			CLBatchInfo result = batchDB.getBatchInfoByFileName(Constants.batchInprogressStatus, inboundFileName);
 			String username = Utility.getusername(Constants.waiveBatchJobType);
 			if (result != null) {
 				batchID = result.getBatchId();
 				batchDB.updateInboundReceiveStatus(Constants.batchReceiveStatus, batchID, syncFileName, username);
 
 			} else {
-				throw new Exception("Not Find Batch ID : " + fileDatExtName);
+				throw new Exception("Not Find Batch ID : " + inboundFileName);
 			}
 			// 2. read .dat
 			int recordNum = 1;
 			HashMap<BigDecimal, String> treatmentIDlist = new HashMap<BigDecimal, String>();
-			for(int i=1;i<10;i++){
-				String dataContent = "";/// ?????????????????อ่านในไฟล์แหละ
-				if (!ValidateUtil.isNull(dataContent)) {
-					String[] dataContentArr = dataContent.split(Constants.PIPE);
-					if (dataContentArr != null && dataContentArr.length > 0) {
-						// 3.Find Batch ID & Update Batch to Receive
-						// Status from header file
-						if (dataContent.indexOf("01|") != -1) {
-							context.getLogger().info("Header Data : " + dataContent);
-						} else if (dataContent.indexOf("02|") != -1) {
-							// 4.Read Body File
-							// 4.1 Read per record
-							if (dataContentArr.length == 19) {
-								UpdateResultWaiveBatchBean request = new UpdateResultWaiveBatchBean();
-								request.setBaNo(dataContentArr[3]);
-								request.setBatchID(batchID);
-								request.setInvoiceNumb(dataContentArr[4]);
-								request.setAmount(new BigDecimal(dataContentArr[15]));
-								request.setFileName(syncFileName);
-								if ("Y".equals(dataContentArr[16])) {
-									request.setActionStatus(Constants.actSuccessStatus);
-									request.setAdjStatus(Constants.adjCompleteStatus);
-								} else {
-									request.setActionStatus(Constants.actFailStatus);
-									request.setAdjStatus(Constants.adjFailStatus);
-									request.setFailReason(dataContentArr[17] + ":" + dataContentArr[18]);
-								}
-								// 4.2 Find INVOICE_ID
-								request = findInvoiceIDAndBatchDtlID(request);
-								if (request.getInvoiceID() != null && request.getBatchAdjDtlID() != null) {
-									// 4.3 update waive status
-									CLWaiveTreatementInfo waiveInfo = updateWaive(request, username);
-									if (waiveInfo != null) {
-										treatmentIDlist.put(waiveInfo.getTreatementId(), "");
+			String filePath = processPath + "/" + inboundFileName;
+			BufferedReader br = null;
+			try {
+				br = new BufferedReader(new FileReader(filePath));
+				String sCurrentLine;
+				while ((sCurrentLine = br.readLine()) != null) {
+					String dataContent = sCurrentLine;
+					if (!ValidateUtil.isNull(dataContent)) {
+						String[] dataContentArr = dataContent.split(Constants.PIPE);
+						if (dataContentArr != null && dataContentArr.length > 0) {
+							// 3.Find Batch ID & Update Batch to Receive
+							// Status from header file
+							if (dataContent.indexOf("01|") != -1) {
+								context.getLogger().info("Header Data : " + dataContent);
+							} else if (dataContent.indexOf("02|") != -1) {
+								// 4.Read Body File
+								// 4.1 Read per record
+								if (dataContentArr.length == 19) {
+									UpdateResultWaiveBatchBean request = new UpdateResultWaiveBatchBean();
+									request.setBaNo(dataContentArr[3]);
+									request.setBatchID(batchID);
+									request.setInvoiceNumb(dataContentArr[4]);
+									request.setAmount(new BigDecimal(dataContentArr[15]));
+									request.setFileName(syncFileName);
+									if ("Y".equals(dataContentArr[16])) {
+										request.setActionStatus(Constants.actSuccessStatus);
+										request.setAdjStatus(Constants.adjCompleteStatus);
+									} else {
+										request.setActionStatus(Constants.actFailStatus);
+										request.setAdjStatus(Constants.adjFailStatus);
+										request.setFailReason(dataContentArr[17] + ":" + dataContentArr[18]);
 									}
+									// 4.2 Find INVOICE_ID
+									request = findInvoiceIDAndBatchDtlID(request);
+									if (request.getInvoiceID() != null && request.getBatchAdjDtlID() != null) {
+										// 4.3 update waive status
+										CLWaiveTreatementInfo waiveInfo = updateWaive(request, username);
+										if (waiveInfo != null) {
+											treatmentIDlist.put(waiveInfo.getTreatementId(), "");
+										}
+									} else {
+										context.getLogger()
+												.info("Not Found Invoice ID or BatchAdjDtlID in Invoice Numb :"
+														+ request.getInvoiceNumb());
+									}
+
 								} else {
-									context.getLogger().info("Not Found Invoice ID or BatchAdjDtlID in Invoice Numb :"
-											+ request.getInvoiceNumb());
+									throw new Exception("File Wrong format body " + recordNum + ": " + dataContent);
 								}
-
+								recordNum++;
+							} else if (dataContent.indexOf("09|") != -1) {
+								context.getLogger().info("Footer Data : " + dataContent);
 							} else {
-								throw new Exception("File Wrong format body " + recordNum + ": " + dataContent);
+								context.getLogger().info("Wrong record type : " + dataContent);
 							}
-							recordNum++;
-						} else if (dataContent.indexOf("09|") != -1) {
-							context.getLogger().info("Footer Data : " + dataContent);
 						} else {
-							context.getLogger().info("Wrong record type : " + dataContent);
+							throw new Exception("Not Found |:" + dataContent);
 						}
-					} else {
-						throw new Exception("Not Found |:" + dataContent);
-					}
 
-				} else {
-					throw new Exception("Not Find Content in record ");
+					} else {
+						throw new Exception("Not Find Content in record ");
+					}
 				}
+			} finally {
+				if (br != null)
+					br.close();
 			}
 
-			//Update Treatement
+			// Update Treatement
 			// 5.Update Treatment by Treatment ID
 			if (treatmentIDlist != null && treatmentIDlist.size() > 0) {
 				for (BigDecimal key : treatmentIDlist.keySet()) {
@@ -158,7 +169,7 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 
 						/* Update Treatment */
 						CLTreatment treatmentDB = new CLTreatment(context.getLogger());
-						treatmentDB.updateTreatmentReceive(treatResult, key, username,"");
+						treatmentDB.updateTreatmentReceive(treatResult, key, username, "");
 					} else {
 						context.getLogger().info("not found treatment");
 					}
@@ -167,8 +178,8 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 			} else {
 				context.getLogger().info("treatmentIDlist size =0");
 			}
-			
-			/*6. Update Batch Status to Complete*/
+
+			/* 6. Update Batch Status to Complete */
 			batchDB.updateInboundCompleteStatus(batchID, username);
 		} catch (Exception e) {
 			e.printStackTrace();

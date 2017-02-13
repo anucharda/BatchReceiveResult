@@ -1,28 +1,88 @@
 package th.co.ais.cpac.cl.batch.cmd.waivebatch;
 
+import java.io.File;
+
+import th.co.ais.cpac.cl.batch.Constants;
+import th.co.ais.cpac.cl.batch.util.FileUtil;
+import th.co.ais.cpac.cl.batch.util.PropertiesReader;
 import th.co.ais.cpac.cl.common.Context;
 
 public class ReceiveWaiveBatchWorker {
 
 	public static void main(String[] args) {
-		 Context context = new Context();
-		 context.initailLogger("LoggerReceiveWaiveBatchWorker", "XXXX|YYYYY");
-		// TODO Auto-generated method stub
-		 context.getLogger().info("Start ReceiveWaiveBatchWorker....");
-		//suspendJobType=S,terminateJobType=T,reconnectJobType=R
-		 String syncFileName="";//Sync File Name
-		 execute(context,syncFileName);///?????????????????
-		 context.getLogger().info("End ReceiveWaiveBatchWorker....");
-	}
+		try{
+			Context context = new Context();
+			context.initailLogger("LoggerReceiveSFFWorker", "XXXX|YYYYY");
+			// TODO Auto-generated method stub
+			context.getLogger().info("----------------------- Start ReceiveWaiveBatchWorker -----------------------");
+			context.getLogger().info("Load configure....");
+			PropertiesReader reader = new PropertiesReader("th.co.ais.cpac.cl.batch", "SystemConfigPath");
+			// suspendJobType=S,terminateJobType=T,reconnectJobType=R
+			String jobType = args[0];// From Parameter
+			boolean doProcess=true;
+			String inboundSyncPath="" ;
+			String inboundDataPath="" ;
+			String processPath="";
+			if(Constants.waiveBatchJobType.equals(jobType)){
+				inboundSyncPath= reader.get("waiveBatch.inboundSyncPath");
+				inboundDataPath =reader.get("waiveBatch.inboundDataPath");
+				processPath = reader.get("waiveBatch.processPath");
+			}else{
+				doProcess=false;
+				context.getLogger().info("not found job type : "+jobType);
+			}
+			
+			if(doProcess){
+				File[] files = FileUtil.getAllFilesThatMatchFilenameExtensionAscendingOrder(inboundSyncPath, "sync");
+				context.getLogger().info("Sync file size --> "+files.length);
+				String syncFileName = "";
+				String dataFileName = "";
+				if(files!=null && files.length>0){
+					String syncFile = files[0].getPath();
+					context.getLogger().info("Sync file is --> "+syncFile);
+					syncFileName = files[0].getName();
+					dataFileName = syncFileName.replace(".sync", ".dat");
+					context.getLogger().info("Data File Name --> "+dataFileName);
+					File source = new File(inboundDataPath+"/"+dataFileName);
+					if(source.exists()){
+						File dest = new File(processPath+"/"+dataFileName);
+						FileUtil.copyFile(source, dest);
+						context.getLogger().info("Copy file to process directory successed --> "+dataFileName);
+						//Delete source file after copy to process directory completed.
+						if(source.delete()){
+							context.getLogger().info("Delete file from inbound directory successed --> "+source.getParent());
+						}else{
+							throw new Exception("Error occur delete file from inbound directory --> "+source.getParent());
+						}
+					}
+					File sourceSyncFile = new File(syncFile);
+					File destSyncFile = new File(processPath+"/"+syncFileName);
+					FileUtil.copyFile(sourceSyncFile, destSyncFile);
+					//Delete source file after copy to process directory completed.
+					if(sourceSyncFile.delete()){
+						context.getLogger().info("Delete file from inbound directory successed --> "+sourceSyncFile.getParent());
+					}else{
+						throw new Exception("Error occur delete file from inbound directory --> "+sourceSyncFile.getParent());
+					}
+					execute(context,  processPath,syncFileName,dataFileName);
+				}else{
+					context.getLogger().info("Not found sync file in directory --> "+inboundSyncPath);
+				}
+			}
 	
-	public static void execute(Context context,String syncFileName){
-		 context.getLogger().info("Start UpdateWaiveBatchResultProcess Execute....");
-		 //Check จากชื่อไฟล์ว่าเป็น batch suspense/reconnect/terminate
-		
-		 context.getLogger().info("Trigger UpdateWaiveBatchResultProcess....");
-		 new UpdateWaiveBatchResultProcess().executeProcess(context,syncFileName); ///?????????????????
-		 context.getLogger().info("End UpdateWaiveBatchResultProcess Execute....");
+			context.getLogger().info("End ReceiveWaiveBatchWorker....");
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
-	
+
+	public static void execute(Context context, String processPath,String syncFileName,String inboundFileName) {
+		context.getLogger().info("Start UpdateWaiveBatchResultProcess Execute....");
+		// Check จากชื่อไฟล์ว่าเป็น batch suspense/reconnect/terminate
+
+		context.getLogger().info("Trigger UpdateWaiveBatchResultProcess....");
+		new UpdateWaiveBatchResultProcess().executeProcess(context, processPath,syncFileName,inboundFileName); /// ?????????????????
+		context.getLogger().info("End UpdateWaiveBatchResultProcess Execute....");
+	}
 
 }
