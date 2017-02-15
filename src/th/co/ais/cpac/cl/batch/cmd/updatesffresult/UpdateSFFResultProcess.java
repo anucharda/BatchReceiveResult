@@ -26,14 +26,14 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 		return Constants.cldbConfPath;
 	}
 
-	public void executeProcess(Context context, String jobType, String syncFile,String dataPath) { // suspendJobType=S,terminateJobType=T,reconnectJobType=R
+	public void executeProcess(Context context, String jobType, String syncFile,String processPath) { // suspendJobType=S,terminateJobType=T,reconnectJobType=R
 		context.getLogger().info("Start UpdateSFFResultProcess.executeProcess");
 		execute();
-		readFile(context, jobType, syncFile,dataPath);
+		readFile(context, jobType, syncFile,processPath);
 		context.getLogger().info("End UpdateSFFResultProcess.executeProcess");
 	}
 
-	public void readFile(Context context, String jobType, String syncFile,String dataPath) {
+	public void readFile(Context context, String jobType, String syncFile,String processPath) {
 		// อ่าน file ทีละ record
 		// เช็คว่า record แรกของไฟล์เป็น order type ไหน
 		// จบไฟล์ค่อย update treatement โดย grouping ตาม BA,update batch ต่อ
@@ -74,7 +74,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 				treatmentIDlist = new HashMap<BigDecimal, String>();
 				boolean firstFile = false;
 				for (int j = 0; j < syncResult.length; j++) { // for loop file
-					String filePath = dataPath +"/"+syncResult[j];
+					String filePath = processPath +"/"+syncResult[j];
 					boolean successFile = false;
 					if (Constants.sffOKExt.indexOf(filePath) != 1) {// 5. Check
 						successFile = true;
@@ -129,6 +129,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 													request.setOrderType(dataContentArr[2]);
 													request.setSuspendType(dataContentArr[3]);
 													request.setFileName(fileName);
+													request.setSffOrderNo(dataContentArr[7]);
 													request.setActionStatus(Constants.actSuccessStatus);
 												} else {
 													throw new Exception("Success File Wrong format body " + recordNum + ": "

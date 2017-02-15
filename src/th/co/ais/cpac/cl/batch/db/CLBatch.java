@@ -82,7 +82,7 @@ public class CLBatch {
 			StringBuilder sql = new StringBuilder();
 			sql.append(" SELECT").append(Constants.END_LINE);
 			sql.append(" BATCH_ID ").append(Constants.END_LINE);
-			sql.append(" CL_BATCH ").append(Constants.END_LINE);
+			sql.append(" FROM dbo.CL_BATCH ").append(Constants.END_LINE);
 			sql.append(" WHERE BATCH_FILE_NAME = ('").append(fileName).append("') ").append(Constants.END_LINE);
 			sql.append(" and INBOUND_STATUS = (").append(inboundStatus).append(")").append(Constants.END_LINE);
 			return sql;

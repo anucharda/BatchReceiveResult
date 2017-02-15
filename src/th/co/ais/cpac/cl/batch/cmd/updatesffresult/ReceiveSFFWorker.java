@@ -12,13 +12,14 @@ import th.co.ais.cpac.cl.common.Context;
 public class ReceiveSFFWorker {
 
 	public static void main(String[] args) {
+		Context context = new Context();
 		try{
-			Context context = new Context();
-			context.initailLogger("LoggerReceiveSFFWorker", "XXXX|YYYYY");
+			
+			context.initailLogger("LoggerReceive", "XXXX|YYYYY");
 			// TODO Auto-generated method stub
 			context.getLogger().info("----------------------- Start ReceiveSFFWorker -----------------------");
 			context.getLogger().info("Load configure....");
-			PropertiesReader reader = new PropertiesReader("th.co.ais.cpac.cl.batch","SystemConfigPath");
+			PropertiesReader reader = new PropertiesReader("th.co.ais.cpac.cl.batch.properties.resource","SystemConfigPath");
 			//suspendJobType=S,terminateJobType=T,reconnectJobType=R
 			String jobType=args[0];//From Parameter
 		
@@ -84,7 +85,7 @@ public class ReceiveSFFWorker {
 							throw new Exception("Error occur delete file from inbound directory --> "+sourceSyncFile.getParent());
 						}
 						
-						execute(context, jobType, destSyncFile.getPath(),inboundDataPath);
+						execute(context, jobType, destSyncFile.getPath(),processPath);
 					}else{
 						context.getLogger().info("Not found content in sync file --> "+syncFile);
 					}
@@ -96,14 +97,14 @@ public class ReceiveSFFWorker {
 			
 			context.getLogger().info("----------------------- End ReceiveSFFWorker ----------------------- ");
 		}catch(Exception e){
-			e.printStackTrace();
+			context.getLogger().info("Error->"+e.getMessage()+": "+e.getCause().toString());
 		}
 	}
 	
-	public static void execute(Context context,String jobType,String syncFileName,String inboundDataPath){
+	public static void execute(Context context,String jobType,String syncFileName,String processPath){
 		 context.getLogger().info("Start UpdateSFFResultProcess Execute....");
 		 context.getLogger().info("Trigger Update SSF Result Process....");
-		 new UpdateSFFResultProcess().executeProcess(context,jobType,syncFileName,inboundDataPath); ///?????????????????
+		 new UpdateSFFResultProcess().executeProcess(context,jobType,syncFileName,processPath); ///?????????????????
 		 context.getLogger().info("End UpdateSFFResultProcess Execute....");
 	}
 	
