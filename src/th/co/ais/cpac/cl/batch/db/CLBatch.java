@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import th.co.ais.cpac.cl.batch.Constants;
-import th.co.ais.cpac.cl.batch.db.CLOrder.ExecuteResponse;
+import th.co.ais.cpac.cl.common.Context;
 import th.co.ais.cpac.cl.common.UtilityLogger;
 import th.co.ais.cpac.cl.template.database.DBConnectionPools;
 import th.co.ais.cpac.cl.template.database.DBTemplatesExecuteQuery;
@@ -100,14 +100,28 @@ public class CLBatch {
 			this.fileName = fileName;
 			return executeQuery(Constants.getDBConnectionPools(logger), true);
 		}
+		
 	}
 
-	public CLBatchInfo getBatchInfoByFileName(int inboundStatus, String fileName) {
+	public CLBatchInfo getBatchInfoByFileName(int inboundStatus, String fileName,Context context) throws Exception {
 		CLBatchInfo batchInfo = null;
+		
 		CLBatchInfoResponse response = new FindBatchIDAction(logger).execute(inboundStatus, fileName);
-		if (response.getResponse() != null && response.getResponse().size() > 0) {
-			batchInfo = response.getResponse().get(0);
+		context.getLogger().debug("getBatchInfoByFileName->"+response.info().toString());
+		
+		switch(response.getStatusCode()){
+			case CLBatchInfoResponse.STATUS_COMPLETE:{
+				batchInfo = response.getResponse().get(0);
+				break;
+			}
+			case CLBatchInfoResponse.STATUS_DATA_NOT_FOUND:{
+				break;
+			}
+			default:{
+				throw new Exception("Error : " + response.getErrorMsg());
+			}
 		}
+		
 		return batchInfo;
 	}
 
@@ -148,8 +162,24 @@ public class CLBatch {
 		}
 	}
 
-	public ExecuteResponse updateInboundReceiveStatus(int inboundStatus,  BigDecimal batchID,String fileName,String username) {
-		return new UpdateBatchReceiveAction(logger).execute(inboundStatus, batchID,fileName,username);
+	public ExecuteResponse updateInboundReceiveStatus(int inboundStatus,  BigDecimal batchID,String fileName,String username,Context context) throws Exception {
+		ExecuteResponse response=new UpdateBatchReceiveAction(logger).execute(inboundStatus, batchID,fileName,username);
+		
+		context.getLogger().debug("updateInboundReceiveStatus->"+response.info().toString());
+		
+		switch(response.getStatusCode()){
+			case CLBatchInfoResponse.STATUS_COMPLETE:{
+				break;
+			}
+			case CLBatchInfoResponse.STATUS_DATA_NOT_FOUND:{
+				break;
+			}
+			default:{
+				throw new Exception("Error : " + response.getErrorMsg());
+			}
+		}
+
+		return response; 
 	}
 	protected class UpdateBatchCompleteAction extends DBTemplatesUpdate<ExecuteResponse, UtilityLogger, DBConnectionPools> {
 		private BigDecimal batchID;
@@ -183,7 +213,23 @@ public class CLBatch {
 		}
 	}
 
-	public ExecuteResponse updateInboundCompleteStatus(BigDecimal batchID,String username) {
-		return new UpdateBatchCompleteAction(logger).execute(batchID,username);
+	public ExecuteResponse updateInboundCompleteStatus(BigDecimal batchID,String username,Context context) throws Exception {
+		
+		ExecuteResponse response=new UpdateBatchCompleteAction(logger).execute(batchID,username);
+		context.getLogger().debug("updateInboundCompleteStatus->"+response.info().toString());
+		
+		switch(response.getStatusCode()){
+			case CLBatchInfoResponse.STATUS_COMPLETE:{
+				break;
+			}
+			case CLBatchInfoResponse.STATUS_DATA_NOT_FOUND:{
+				break;
+			}
+			default:{
+				throw new Exception("Error : " + response.getErrorMsg());
+			}
+		}
+		
+		return response;
 	}
 }

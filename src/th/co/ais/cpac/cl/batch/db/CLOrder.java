@@ -4,9 +4,9 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 
 import th.co.ais.cpac.cl.batch.Constants;
+import th.co.ais.cpac.cl.common.Context;
 import th.co.ais.cpac.cl.common.UtilityLogger;
 import th.co.ais.cpac.cl.template.database.DBConnectionPools;
 import th.co.ais.cpac.cl.template.database.DBTemplatesExecuteQuery;
@@ -154,13 +154,22 @@ public class CLOrder {
 		}
 	}
 
-	public CLOrderTreatementInfo getOrderTreatementInfo(String mobileNo,BigDecimal batchID, int actStatus) {
+	public CLOrderTreatementInfo getOrderTreatementInfo(String mobileNo,BigDecimal batchID, int actStatus,Context context) throws Exception {
 		CLOrderTreatementInfo orderInfo = null;
 		CLOrderInfoResponse response = new GetOrderTreatementInfoByMobileAndAction(logger).execute(mobileNo,batchID,actStatus);
-		if (response.getResponse() != null && response.getResponse().size() > 0) {
-			orderInfo = response.getResponse().get(0);
-		}else{
-			return null;
+		context.getLogger().debug("getOrderTreatementInfo->"+response.info().toString());
+
+		switch(response.getStatusCode()){
+			case CLOrderInfoResponse.STATUS_COMPLETE:{
+				orderInfo = response.getResponse().get(0);
+				break;
+			}
+			case CLOrderInfoResponse.STATUS_DATA_NOT_FOUND:{
+				break;
+			}
+			default:{
+				throw new Exception("Error : " + response.getErrorMsg());
+			}
 		}
 		return orderInfo;
 	}
@@ -213,8 +222,22 @@ public class CLOrder {
 		}
 	}
 
-	public ExecuteResponse updateOrderStatus(String mobileNo,BigDecimal batchID, int actionStatus, String sffOrderNo, String failReason,String updateBy) {
-		return new UpdateOrderStatus(logger).execute(mobileNo,batchID, actionStatus, sffOrderNo, failReason, updateBy);
+	public ExecuteResponse updateOrderStatus(String mobileNo,BigDecimal batchID, int actionStatus, String sffOrderNo, String failReason,String updateBy,Context context) throws Exception {
+		ExecuteResponse response=new UpdateOrderStatus(logger).execute(mobileNo,batchID, actionStatus, sffOrderNo, failReason, updateBy);
+		context.getLogger().debug("updateOrderStatus->"+response.info().toString());
+
+		switch(response.getStatusCode()){
+			case CLOrderInfoResponse.STATUS_COMPLETE:{
+				break;
+			}
+			case CLOrderInfoResponse.STATUS_DATA_NOT_FOUND:{
+				break;
+			}
+			default:{
+				throw new Exception("Error : " + response.getErrorMsg());
+			}
+		}
+		return response;
 	}
 
 	protected class GetOrderTreatementInfoByTreatment
@@ -260,9 +283,23 @@ public class CLOrder {
 		}
 	}
 	
-	public CLOrderInfoResponse getOrderTreatementInfoByTreatmentID(BigDecimal treatmentID) {
+	public CLOrderInfoResponse getOrderTreatementInfoByTreatmentID(BigDecimal treatmentID,Context context) throws Exception {
 		CLOrderInfoResponse orderList = null;
 		orderList = new GetOrderTreatementInfoByTreatment(logger).execute(treatmentID);
+		context.getLogger().debug("getOrderTreatementInfoByTreatmentID->"+orderList.info().toString());
+
+		switch(orderList.getStatusCode()){
+			case CLOrderInfoResponse.STATUS_COMPLETE:{
+				break;
+			}
+			case CLOrderInfoResponse.STATUS_DATA_NOT_FOUND:{
+				break;
+			}
+			default:{
+				throw new Exception("Error : " + orderList.getErrorMsg());
+			}
+		}
+
 		return orderList;
 	}
 

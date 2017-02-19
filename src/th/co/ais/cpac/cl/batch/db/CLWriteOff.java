@@ -7,9 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import th.co.ais.cpac.cl.batch.Constants;
-import th.co.ais.cpac.cl.batch.db.CLOrder.CLOrderInfoResponse;
-import th.co.ais.cpac.cl.batch.db.CLOrder.CLOrderTreatementInfo;
-import th.co.ais.cpac.cl.batch.db.CLOrder.GetOrderTreatementInfoByMobileAndAction;
+import th.co.ais.cpac.cl.common.Context;
 import th.co.ais.cpac.cl.common.UtilityLogger;
 import th.co.ais.cpac.cl.template.database.DBConnectionPools;
 import th.co.ais.cpac.cl.template.database.DBTemplatesExecuteQuery;
@@ -128,8 +126,22 @@ public class CLWriteOff {
 		}
 	}
 
-	public CLWriteOffInfoResponse getOrderTreatementInfo(BigDecimal batchID) {
-		CLWriteOffInfoResponse response = new GetWriteOffTreatementInfoByBatch(logger).execute(batchID);
+	public CLWriteOffInfoResponse getOrderTreatementInfo(BigDecimal batchID,Context context) throws Exception {
+		CLWriteOffInfoResponse response = new GetWriteOffTreatementInfoByBatch(logger).execute(batchID);	
+		context.getLogger().debug("getOrderTreatementInfo->"+response.info().toString());
+
+		switch(response.getStatusCode()){
+			case CLWriteOffInfoResponse.STATUS_COMPLETE:{
+				break;
+			}
+			case CLWriteOffInfoResponse.STATUS_DATA_NOT_FOUND:{
+				break;
+			}
+			default:{
+				throw new Exception("Error : " + response.getErrorMsg());
+			}
+		}
+		
 		return response;
 	}
 

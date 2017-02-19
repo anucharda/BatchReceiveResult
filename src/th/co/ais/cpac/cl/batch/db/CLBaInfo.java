@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import th.co.ais.cpac.cl.batch.Constants;
+import th.co.ais.cpac.cl.common.Context;
 import th.co.ais.cpac.cl.common.UtilityLogger;
 import th.co.ais.cpac.cl.template.database.DBConnectionPools;
 import th.co.ais.cpac.cl.template.database.DBTemplatesResponse;
@@ -66,8 +67,23 @@ public class CLBaInfo {
 		}
 	}
 
-	public ExecuteResponse updateTreatmentReceive(String baNo,Date writeOffDtm,  BigDecimal writeOffTypeID,String username) {
-		return new UpdateBaInfoAction(logger).execute(baNo, writeOffDtm,writeOffTypeID,username);
+	public ExecuteResponse updateTreatmentReceive(String baNo,Date writeOffDtm,  BigDecimal writeOffTypeID,String username,Context context) throws Exception {
+		ExecuteResponse response=new UpdateBaInfoAction(logger).execute(baNo, writeOffDtm,writeOffTypeID,username);
+		
+		context.getLogger().debug("updateTreatmentReceive->"+response.info().toString());
+		switch(response.getStatusCode()){
+			case ExecuteResponse.STATUS_COMPLETE:{
+				break;
+			}
+			case ExecuteResponse.STATUS_DATA_NOT_FOUND:{
+				break;
+			}
+			default:{
+				throw new Exception("Error : " + response.getErrorMsg());
+			}
+		}
+		
+		return response;
 	}
 
 }

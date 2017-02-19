@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import th.co.ais.cpac.cl.batch.Constants;
+import th.co.ais.cpac.cl.common.Context;
 import th.co.ais.cpac.cl.common.UtilityLogger;
 import th.co.ais.cpac.cl.template.database.DBConnectionPools;
 import th.co.ais.cpac.cl.template.database.DBTemplatesExecuteQuery;
@@ -104,8 +105,21 @@ public class PMBatchAdjDtl {
 		}
 	}
 
-	public PMBatchAdjInfoResponse getBatchDtlIDByInvoiceID(BigDecimal invoiceID,BigDecimal amount,String adjStatus) {
+	public PMBatchAdjInfoResponse getBatchDtlIDByInvoiceID(BigDecimal invoiceID,BigDecimal amount,String adjStatus,Context context) throws Exception {
 		PMBatchAdjInfoResponse response = new FindPMBatchAdjDtlAction(logger).execute(invoiceID,amount,adjStatus);
+		context.getLogger().debug("getBatchDtlIDByInvoiceID->"+response.info().toString());
+
+		switch(response.getStatusCode()){
+			case PMBatchAdjInfoResponse.STATUS_COMPLETE:{
+				break;
+			}
+			case PMBatchAdjInfoResponse.STATUS_DATA_NOT_FOUND:{
+				break;
+			}
+			default:{
+				throw new Exception("Error : " + response.getErrorMsg());
+			}
+		}
 		return response;
 	}
 

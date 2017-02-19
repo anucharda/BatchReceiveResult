@@ -4,14 +4,6 @@ public class Test {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		String fileName="DMSRequest_20150817_232541.ok";
-		
-		System.out.println(fileName.indexOf(".ok"));
-		System.out.println(fileName.indexOf(".err"));
-		
-		String text="01|DMSRequest_20150817_232541.dat ";
-		String [] arrStr=text.split(Constants.PIPE);
-		System.out.println(arrStr[1]);
+		System.out.println(String.format("%s%n%s%n%s%n%s", "|010554811589700", "31300000954978", "0859295826", "51579"));
 	}
-
 }

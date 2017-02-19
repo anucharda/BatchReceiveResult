@@ -3,9 +3,9 @@ package th.co.ais.cpac.cl.batch.db;
 import java.math.BigDecimal;
 
 import th.co.ais.cpac.cl.batch.Constants;
-import th.co.ais.cpac.cl.batch.db.CLBatch.ExecuteResponse;
-import th.co.ais.cpac.cl.batch.db.CLBatch.UpdateBatchReceiveAction;
+import th.co.ais.cpac.cl.batch.db.CLOrder.CLOrderInfoResponse;
 import th.co.ais.cpac.cl.batch.util.ValidateUtil;
+import th.co.ais.cpac.cl.common.Context;
 import th.co.ais.cpac.cl.common.UtilityLogger;
 import th.co.ais.cpac.cl.template.database.DBConnectionPools;
 import th.co.ais.cpac.cl.template.database.DBTemplatesResponse;
@@ -71,8 +71,23 @@ public class CLTreatment {
 		}
 	}
 
-	public ExecuteResponse updateTreatmentReceive(int actStatus,  BigDecimal treatmentID,String username,String failReason) {
-		return new UpdateTreatmentReceiveAction(logger).execute(actStatus, treatmentID,username,failReason);
+	public ExecuteResponse updateTreatmentReceive(int actStatus,  BigDecimal treatmentID,String username,String failReason,Context context) throws Exception {
+		ExecuteResponse response= new UpdateTreatmentReceiveAction(logger).execute(actStatus, treatmentID,username,failReason);
+		context.getLogger().debug("updateTreatmentReceive->"+response.info().toString());
+
+		switch(response.getStatusCode()){
+			case CLOrderInfoResponse.STATUS_COMPLETE:{
+				break;
+			}
+			case CLOrderInfoResponse.STATUS_DATA_NOT_FOUND:{
+				break;
+			}
+			default:{
+				throw new Exception("Error : " + response.getErrorMsg());
+			}
+		}
+		
+		return response;
 	}
 
 }

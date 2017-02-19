@@ -26,14 +26,14 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 		return Constants.cldbConfPath;
 	}
 
-	public void executeProcess(Context context, String jobType, String syncFile,String processPath) { // suspendJobType=S,terminateJobType=T,reconnectJobType=R
+	public void executeProcess(Context context, String jobType, String[] fileNames,String processPath) { // suspendJobType=S,terminateJobType=T,reconnectJobType=R
 		context.getLogger().info("Start UpdateSFFResultProcess.executeProcess");
 		execute();
-		readFile(context, jobType, syncFile,processPath);
+		readFile(context, jobType, fileNames,processPath);
 		context.getLogger().info("End UpdateSFFResultProcess.executeProcess");
 	}
 
-	public void readFile(Context context, String jobType, String syncFile,String processPath) {
+	public void readFile(Context context, String jobType, String[] fileNames,String processPath) {
 		// อ่าน file ทีละ record
 		// เช็คว่า record แรกของไฟล์เป็น order type ไหน
 		// จบไฟล์ค่อย update treatement โดย grouping ตาม BA,update batch ต่อ
@@ -42,7 +42,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 		try {
 			context.getLogger().info("Start UpdateSFFResultProcess.readFile");
 			context.getLogger().info("jobType->" +  Utility.getJobName(jobType));
-			context.getLogger().info("SyncFileName->" + syncFile);
+			context.getLogger().info("fileNames->" + fileNames.toString());
 
 			if (Constants.suspendJobType.equals(jobType) || Constants.terminateJobType.equals(jobType)
 					|| Constants.reconnectJobType.equals(jobType)) {
@@ -53,13 +53,10 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 			//	String failFileName = "";
 				String batchFileName = "";
 				BigDecimal batchID = null;
-				String username = Utility.getusername(jobType);				
-				String allFilePath = FileUtil.readFile(syncFile);
-				String[] syncResult = allFilePath.toString().split("\\|");
-				
+				String username = Utility.getusername(jobType);								
 				// 2. อ่านชื่อไฟล์จากไฟล์ .sync
-				for(int i=0;i<syncResult.length;i++) {// อ่านไฟล์ sync
-					String outputFileName = syncResult[i];
+				for(int i=0;i<fileNames.length;i++) {// อ่านไฟล์ sync
+					String outputFileName = fileNames[i];
 					if (outputFileName.indexOf(Constants.sffOKExt) != -1) {
 						batchFileName = batchFileName + outputFileName;
 					} else if (outputFileName.indexOf(Constants.sffErrExt) != -1) {
@@ -73,15 +70,15 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 				// 2.1. //........ read file ok & err
 				treatmentIDlist = new HashMap<BigDecimal, String>();
 				boolean firstFile = false;
-				for (int j = 0; j < syncResult.length; j++) { // for loop file
-					String filePath = processPath +"/"+syncResult[j];
+				for (int j = 0; j < fileNames.length; j++) { // for loop file
+					String filePath = processPath +"/"+fileNames[j];
 					boolean successFile = false;
 					if (Constants.sffOKExt.indexOf(filePath) != 1) {// 5. Check
 						successFile = true;
 					}
 					if (!ValidateUtil.isNull(filePath)) {
 						context.getLogger()
-								.info("Start Read File ->" + j + 1 + "/" + syncResult.length + "->" + filePath);
+								.info("Start Read File ->" + j + 1 + "/" + fileNames.length + "->" + filePath);
 						int recordNum = 1;
 						
 						BufferedReader br = null;
@@ -105,13 +102,14 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 											
 												if(!firstFile){
 													CLBatch batchDB = new CLBatch(context.getLogger());
-													CLBatchInfo result = batchDB.getBatchInfoByFileName(Constants.batchInprogressStatus, fileName);
+													CLBatchInfo result = batchDB.getBatchInfoByFileName(Constants.batchInprogressStatus, fileName,context);
+
 													if (result != null) {
 													// 3.2 Update Batch Status to
 													// Receive
 														batchID = result.getBatchId();
 														batchDB.updateInboundReceiveStatus(Constants.batchReceiveStatus,
-															batchID, batchFileName, username);
+															batchID, batchFileName, username,context);
 														firstFile = true;
 													} else {
 														throw new Exception("Not Find Batch ID : " + filePath);
@@ -183,7 +181,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 					for (BigDecimal key : treatmentIDlist.keySet()) {
 						CLOrder tbl = new CLOrder(context.getLogger());
 						// Select Action Status by TREATMENT_ID
-						CLOrderInfoResponse orderResult = tbl.getOrderTreatementInfoByTreatmentID(key);
+						CLOrderInfoResponse orderResult = tbl.getOrderTreatementInfoByTreatmentID(key,context);
 						if (orderResult != null && orderResult.getResponse() != null
 								&& orderResult.getResponse().size() > 0) {
 							boolean successFlag = false;
@@ -211,7 +209,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 
 							/* Update Treatment */
 							CLTreatment treatmentDB = new CLTreatment(context.getLogger());
-							treatmentDB.updateTreatmentReceive(treatResult, key, username,"");
+							treatmentDB.updateTreatmentReceive(treatResult, key, username,"",context);
 						} else {
 							context.getLogger().info("not found treatment");
 						}
@@ -223,7 +221,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 				
 				/*6. Update Batch Status to Complete*/
 				CLBatch batchDB = new CLBatch(context.getLogger());
-				batchDB.updateInboundCompleteStatus(batchID, username);
+				batchDB.updateInboundCompleteStatus(batchID, username,context);
 			}
 		} catch (Exception e) {
 			context.getLogger().info("Error->"+e.getMessage()+": "+e.getCause().toString());
@@ -233,7 +231,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 	}
 
 
-	public CLOrderTreatementInfo updateOrder(UpdateResultSSFBean request, Context context, String username) {
+	public CLOrderTreatementInfo updateOrder(UpdateResultSSFBean request, Context context, String username) throws Exception {
 		/**********************
 		 * 1.Get Record Inprocess 2.Update Order Success Status
 		 */
@@ -242,10 +240,10 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 		// Criteria ORDER_ACTION_ID = Suspend,Reconnect,Terminate Action_status=
 		// inprocess
 		orderInfo = tbl.getOrderTreatementInfo(request.getMobileNo(), request.getBatchID(),
-				Constants.actInprogressStatus);
+				Constants.actInprogressStatus,context);
 		if (orderInfo != null) {
 			tbl.updateOrderStatus(request.getMobileNo(), request.getBatchID(), request.getActionStatus(),
-					request.getSffOrderNo(), request.getFailReason(), username);
+					request.getSffOrderNo(), request.getFailReason(), username,context);
 		} else {
 			context.getLogger().info("no orderInfo -> " + request.toString());
 		}

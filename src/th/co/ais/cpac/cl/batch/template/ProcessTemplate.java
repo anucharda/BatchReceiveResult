@@ -48,7 +48,7 @@ public abstract class ProcessTemplate {
 		database = new CNFDatabase(fileConfig);
 
 		context = new Context();
-		context.initailLogger("LoggerMasterBatchInfo", System.currentTimeMillis() + "");
+		context.initailLogger("LoggerReceive", System.currentTimeMillis() + "");
 
 		DBConnectionPools<CNFDatabase, UtilityLogger> pool = new DBConnectionPools<>(database, context.getLogger());
 		pool.buildeDataSource();

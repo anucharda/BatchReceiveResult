@@ -13,6 +13,7 @@ public class ReceiveSFFWorker {
 
 	public static void main(String[] args) {
 		Context context = new Context();
+		//context.initailLogger(name, header);
 		try{
 			
 			context.initailLogger("LoggerReceive", "XXXX|YYYYY");
@@ -52,43 +53,41 @@ public class ReceiveSFFWorker {
 					String syncFile = files[0].getPath();
 					syncFileName = files[0].getName();
 					context.getLogger().info("Sync file is --> "+syncFile);
-					String sb = FileUtil.readFile(syncFile);
-					context.getLogger().info("All files name in sync file--> "+sb.toString());
-					if(!"".equals(sb)){
-						String[] fileNames = sb.toString().split("\\|");
-						//Loop for copy file from inbound to process directory.
-						for(int i=0; i<fileNames.length; i++){
-							File source = new File(inboundDataPath+"/"+fileNames[i]);
-							if(source.exists()){
-								File dest = new File(processPath+"/"+fileNames[i]);
-								FileUtil.copyFile(source, dest);
-								context.getLogger().info("Copy file to process directory successed --> "+fileNames[i]);
-								//Delete source file after copy to process directory completed.
-								if(source.delete()){
-									context.getLogger().info("Delete file from inbound directory successed --> "+source.getParent());
-								}else{
-									throw new Exception("Error occur delete file from inbound directory --> "+source.getParent());
-								}
+
+					String[] fileNames=new String[2];
+					fileNames[0]=syncFileName.replaceAll(".sync",Constants.sffOKExt);
+					fileNames[1]=syncFileName.replaceAll(".sync",Constants.sffErrExt);
+					
+					for(int i=0; i<fileNames.length; i++){
+						File source = new File(inboundDataPath+"/"+fileNames[i]);
+						if(source.exists()){
+							File dest = new File(processPath+"/"+fileNames[i]);
+							FileUtil.copyFile(source, dest);
+							context.getLogger().info("Copy file to process directory successed --> "+fileNames[i]);
+							//Delete source file after copy to process directory completed.
+							if(source.delete()){
+								context.getLogger().info("Delete file from inbound directory successed --> "+source.getParent());
 							}else{
-								//Skip to next file.
-								continue;
+								throw new Exception("Error occur delete file from inbound directory --> "+source.getParent());
 							}
-						}
-						//Copy sync file to process directory.
-						File sourceSyncFile = new File(syncFile);
-						File destSyncFile = new File(processPath+"/"+syncFileName);
-						FileUtil.copyFile(sourceSyncFile, destSyncFile);
-						//Delete source file after copy to process directory completed.
-						if(sourceSyncFile.delete()){
-							context.getLogger().info("Delete file from inbound directory successed --> "+sourceSyncFile.getParent());
 						}else{
-							throw new Exception("Error occur delete file from inbound directory --> "+sourceSyncFile.getParent());
+							//Skip to next file.
+							continue;
 						}
-						
-						execute(context, jobType, destSyncFile.getPath(),processPath);
-					}else{
-						context.getLogger().info("Not found content in sync file --> "+syncFile);
 					}
+					//Copy sync file to process directory.
+					File sourceSyncFile = new File(syncFile);
+					File destSyncFile = new File(processPath+"/"+syncFileName);
+					FileUtil.copyFile(sourceSyncFile, destSyncFile);
+					//Delete source file after copy to process directory completed.
+					if(sourceSyncFile.delete()){
+						context.getLogger().info("Delete file from inbound directory successed --> "+sourceSyncFile.getParent());
+					}else{
+						throw new Exception("Error occur delete file from inbound directory --> "+sourceSyncFile.getParent());
+					}
+					
+					execute(context, jobType,fileNames,processPath);
+
 				}else{
 					context.getLogger().info("Not found sync file in directory --> "+inboundSyncPath);
 				}
@@ -101,10 +100,10 @@ public class ReceiveSFFWorker {
 		}
 	}
 	
-	public static void execute(Context context,String jobType,String syncFileName,String processPath){
+	public static void execute(Context context,String jobType,String[] fileNames,String processPath){
 		 context.getLogger().info("Start UpdateSFFResultProcess Execute....");
 		 context.getLogger().info("Trigger Update SSF Result Process....");
-		 new UpdateSFFResultProcess().executeProcess(context,jobType,syncFileName,processPath); ///?????????????????
+		 new UpdateSFFResultProcess().executeProcess(context,jobType,fileNames,processPath); ///?????????????????
 		 context.getLogger().info("End UpdateSFFResultProcess Execute....");
 	}
 	

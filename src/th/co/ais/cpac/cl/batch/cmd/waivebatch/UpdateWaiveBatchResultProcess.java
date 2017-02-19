@@ -55,11 +55,11 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 			BigDecimal batchID = null;
 			// 2. Find Batch ID by fileDatExtName
 			CLBatch batchDB = new CLBatch(context.getLogger());
-			CLBatchInfo result = batchDB.getBatchInfoByFileName(Constants.batchInprogressStatus, inboundFileName);
+			CLBatchInfo result = batchDB.getBatchInfoByFileName(Constants.batchInprogressStatus, inboundFileName,context);
 			String username = Utility.getusername(Constants.waiveBatchJobType);
 			if (result != null) {
 				batchID = result.getBatchId();
-				batchDB.updateInboundReceiveStatus(Constants.batchReceiveStatus, batchID, syncFileName, username);
+				batchDB.updateInboundReceiveStatus(Constants.batchReceiveStatus, batchID, syncFileName, username,context);
 
 			} else {
 				throw new Exception("Not Find Batch ID : " + inboundFileName);
@@ -141,7 +141,7 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 				for (BigDecimal key : treatmentIDlist.keySet()) {
 					CLWaive tbl = new CLWaive(context.getLogger());
 					// Select Action Status by TREATMENT_ID
-					CLWaiveInfoResponse waiveResult = tbl.getWaiveTreatementInfoByTreatmentID(key);
+					CLWaiveInfoResponse waiveResult = tbl.getWaiveTreatementInfoByTreatmentID(key,context);
 					if (waiveResult != null && waiveResult.getResponse() != null
 							&& waiveResult.getResponse().size() > 0) {
 						boolean successFlag = false;
@@ -169,7 +169,7 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 
 						/* Update Treatment */
 						CLTreatment treatmentDB = new CLTreatment(context.getLogger());
-						treatmentDB.updateTreatmentReceive(treatResult, key, username, "");
+						treatmentDB.updateTreatmentReceive(treatResult, key, username, "",context);
 					} else {
 						context.getLogger().info("not found treatment");
 					}
@@ -180,7 +180,7 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 			}
 
 			/* 6. Update Batch Status to Complete */
-			batchDB.updateInboundCompleteStatus(batchID, username);
+			batchDB.updateInboundCompleteStatus(batchID, username,context);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -189,9 +189,9 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 		context.getLogger().debug("End Read File....");
 	}
 
-	public UpdateResultWaiveBatchBean findInvoiceIDAndBatchDtlID(UpdateResultWaiveBatchBean request) {
+	public UpdateResultWaiveBatchBean findInvoiceIDAndBatchDtlID(UpdateResultWaiveBatchBean request) throws Exception {
 		PMInvoice pmInvoiceDB = new PMInvoice(context.getLogger());
-		PMInvoiceInfoResponse pmInvoiceResult = pmInvoiceDB.getInvoiceIDByInvoiceNum(request.getInvoiceNumb());
+		PMInvoiceInfoResponse pmInvoiceResult = pmInvoiceDB.getInvoiceIDByInvoiceNum(request.getInvoiceNumb(),context);
 		if (pmInvoiceResult != null && pmInvoiceResult.getResponse() != null
 				&& pmInvoiceResult.getResponse().size() > 0) {
 			if (pmInvoiceResult.getResponse().size() == 1) {
@@ -199,7 +199,7 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 				PMBatchAdjDtl pmBatchAdjDtlDB = new PMBatchAdjDtl(context.getLogger());
 				PMBatchAdjInfoResponse pmBatchAdjResult = pmBatchAdjDtlDB.getBatchDtlIDByInvoiceID(
 						pmInvoiceResult.getResponse().get(1).getInvoiceID(), request.getAmount(),
-						request.getAdjStatus());
+						request.getAdjStatus(),context);
 				if (pmBatchAdjResult != null && pmBatchAdjResult.getResponse() != null
 						&& pmBatchAdjResult.getResponse().size() > 0) {
 					if (pmBatchAdjResult.getResponse().size() == 1) {
@@ -221,7 +221,7 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 		return request;
 	}
 
-	public CLWaiveTreatementInfo updateWaive(UpdateResultWaiveBatchBean request, String username) {
+	public CLWaiveTreatementInfo updateWaive(UpdateResultWaiveBatchBean request, String username) throws Exception {
 		/**********************
 		 * 1.Get Record Inprocess 2.Update Waive Success Status
 		 */
@@ -229,10 +229,10 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 		CLWaive tbl = new CLWaive(context.getLogger());
 
 		waiveInfo = tbl.getWaiveTreatementInfo(request.getBaNo(), request.getBatchID(), request.getInvoiceID(),
-				Constants.actInprogressStatus);
+				Constants.actInprogressStatus,context);
 		if (waiveInfo != null) {
 			tbl.updateWaiveStatus(request.getBaNo(), request.getBatchID(), request.getInvoiceID(),
-					request.getBatchAdjDtlID(), request.getActionStatus(), request.getFailReason(), username);
+					request.getBatchAdjDtlID(), request.getActionStatus(), request.getFailReason(), username,context);
 		} else {
 			context.getLogger().info("no orderInfo -> " + request.toString());
 		}

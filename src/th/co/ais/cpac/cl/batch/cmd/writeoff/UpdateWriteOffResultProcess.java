@@ -42,12 +42,12 @@ public class UpdateWriteOffResultProcess extends ProcessTemplate {
 			// 2. Find Batch ID by fileDatExtName
 			if (inboundFileName.indexOf("_WO_") != -1) {
 				CLBatch batchDB = new CLBatch(context.getLogger());
-				CLBatchInfo result = batchDB.getBatchInfoByFileName(Constants.batchInprogressStatus, inboundFileName);
+				CLBatchInfo result = batchDB.getBatchInfoByFileName(Constants.batchInprogressStatus, inboundFileName,context);
 				String username = Utility.getusername(Constants.writeOffJobType);
 				if (result != null) {
 					// 2.1 Update File Batch
 					batchID = result.getBatchId();
-					batchDB.updateInboundReceiveStatus(Constants.batchReceiveStatus, batchID, ackFileName, username);
+					batchDB.updateInboundReceiveStatus(Constants.batchReceiveStatus, batchID, ackFileName, username,context);
 					// 2.2 Read File
 					String filePath = processPath + "/" + inboundFileName;
 					BufferedReader br = null;
@@ -85,7 +85,7 @@ public class UpdateWriteOffResultProcess extends ProcessTemplate {
 											findAndUpdateWriteOffResult(request, username);
 
 											// 2.4 Update Batch Result
-											batchDB.updateInboundCompleteStatus(batchID, username);
+											batchDB.updateInboundCompleteStatus(batchID, username,context);
 										} else {
 											throw new Exception("Wrong Type : " + dataContent);
 										}
@@ -121,7 +121,7 @@ public class UpdateWriteOffResultProcess extends ProcessTemplate {
 
 	public void findAndUpdateWriteOffResult(UpdateResultWriteOffBean request, String username) throws Exception {
 		CLWriteOff writeOffDB = new CLWriteOff(context.getLogger());
-		CLWriteOffInfoResponse writeOffResult = writeOffDB.getOrderTreatementInfo(request.getBatchID());
+		CLWriteOffInfoResponse writeOffResult = writeOffDB.getOrderTreatementInfo(request.getBatchID(),context);
 
 		if (writeOffResult != null && writeOffResult.getResponse() != null && writeOffResult.getResponse().size() > 0) {
 			for (int i = 0; i < writeOffResult.getResponse().size(); i++) {
@@ -132,11 +132,11 @@ public class UpdateWriteOffResultProcess extends ProcessTemplate {
 						.append(request.getMsgV3()).append(request.getMsgV4());
 				// 1.Update CL_TREATEMENT
 				treatmentDB.updateTreatmentReceive(request.getActionStatus(), writeOffInfo.getTreatementId(), username,
-						failMsg.toString());
+						failMsg.toString(),context);
 				if (Constants.writeOffSuccess.equals(request.getType())) {
 					CLBaInfo baInfoDB = new CLBaInfo(context.getLogger());
 					baInfoDB.updateTreatmentReceive(writeOffInfo.getBaNo(), writeOffInfo.getWriteOffDtm(),
-							writeOffInfo.getWriteOffTypeId(), username);
+							writeOffInfo.getWriteOffTypeId(), username,context);
 
 				}
 			}

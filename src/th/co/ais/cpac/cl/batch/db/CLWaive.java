@@ -6,11 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import th.co.ais.cpac.cl.batch.Constants;
-import th.co.ais.cpac.cl.batch.db.CLOrder.CLOrderInfoResponse;
-import th.co.ais.cpac.cl.batch.db.CLOrder.CLOrderTreatementInfo;
-import th.co.ais.cpac.cl.batch.db.CLOrder.ExecuteResponse;
-import th.co.ais.cpac.cl.batch.db.CLOrder.GetOrderTreatementInfoByTreatment;
-import th.co.ais.cpac.cl.batch.db.CLOrder.UpdateOrderStatus;
+import th.co.ais.cpac.cl.common.Context;
 import th.co.ais.cpac.cl.common.UtilityLogger;
 import th.co.ais.cpac.cl.template.database.DBConnectionPools;
 import th.co.ais.cpac.cl.template.database.DBTemplatesExecuteQuery;
@@ -148,15 +144,26 @@ public class CLWaive {
 	}
 
 	public CLWaiveTreatementInfo getWaiveTreatementInfo(String baNo, BigDecimal batchID, BigDecimal invoiceID,
-			int actStatus) {
+			int actStatus,Context context) throws Exception {
 		CLWaiveTreatementInfo waiveInfo = null;
 		CLWaiveInfoResponse response = new GetWaiveTreatementInfoInvoiceIDAndAction(logger).execute(baNo, batchID,
 				invoiceID, actStatus);
-		if (response.getResponse() != null && response.getResponse().size() > 0) {
-			waiveInfo = response.getResponse().get(0);
-		} else {
-			return null;
+
+		context.getLogger().debug("getWaiveTreatementInfo->"+response.info().toString());
+
+		switch(response.getStatusCode()){
+			case CLWaiveInfoResponse.STATUS_COMPLETE:{
+				waiveInfo = response.getResponse().get(0);
+				break;
+			}
+			case CLWaiveInfoResponse.STATUS_DATA_NOT_FOUND:{
+				break;
+			}
+			default:{
+				throw new Exception("Error : " + response.getErrorMsg());
+			}
 		}
+
 		return waiveInfo;
 	}
 
@@ -212,9 +219,24 @@ public class CLWaive {
 	}
 
 	public ExecuteResponse updateWaiveStatus(String baNo, BigDecimal batchID, BigDecimal invoiceID,
-			BigDecimal batchAdjID, int actionStatus, String failReason, String updateBy) {
-		return new UpdateWaiveStatus(logger).execute(baNo, batchID, invoiceID, batchAdjID, actionStatus, failReason,
+			BigDecimal batchAdjID, int actionStatus, String failReason, String updateBy,Context context) throws Exception {
+		
+		ExecuteResponse response=new UpdateWaiveStatus(logger).execute(baNo, batchID, invoiceID, batchAdjID, actionStatus, failReason,
 				updateBy);
+		context.getLogger().debug("UpdateWaiveStatus->"+response.info().toString());
+
+		switch(response.getStatusCode()){
+			case CLWaiveInfoResponse.STATUS_COMPLETE:{
+				break;
+			}
+			case CLWaiveInfoResponse.STATUS_DATA_NOT_FOUND:{
+				break;
+			}
+			default:{
+				throw new Exception("Error : " + response.getErrorMsg());
+			}
+		}
+		return  response;
 	}
 
 	protected class GetWaiveTreatementInfoByTreatment
@@ -259,9 +281,24 @@ public class CLWaive {
 		}
 	}
 
-	public CLWaiveInfoResponse getWaiveTreatementInfoByTreatmentID(BigDecimal treatmentID) {
+	public CLWaiveInfoResponse getWaiveTreatementInfoByTreatmentID(BigDecimal treatmentID,Context context) throws Exception {
 		CLWaiveInfoResponse waiveList = null;
 		waiveList = new GetWaiveTreatementInfoByTreatment(logger).execute(treatmentID);
+		
+		context.getLogger().debug("UpdateWaiveStatus->"+waiveList.info().toString());
+
+		switch(waiveList.getStatusCode()){
+			case CLWaiveInfoResponse.STATUS_COMPLETE:{
+				break;
+			}
+			case CLWaiveInfoResponse.STATUS_DATA_NOT_FOUND:{
+				break;
+			}
+			default:{
+				throw new Exception("Error : " + waiveList.getErrorMsg());
+			}
+		}
+		
 		return waiveList;
 	}
 

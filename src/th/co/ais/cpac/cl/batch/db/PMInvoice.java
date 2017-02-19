@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import th.co.ais.cpac.cl.batch.Constants;
+import th.co.ais.cpac.cl.batch.db.PMBatchAdjDtl.PMBatchAdjInfoResponse;
+import th.co.ais.cpac.cl.common.Context;
 import th.co.ais.cpac.cl.common.UtilityLogger;
 import th.co.ais.cpac.cl.template.database.DBConnectionPools;
 import th.co.ais.cpac.cl.template.database.DBTemplatesExecuteQuery;
@@ -91,8 +93,22 @@ public class PMInvoice {
 		}
 	}
 
-	public PMInvoiceInfoResponse getInvoiceIDByInvoiceNum(String invoiceNum) {
+	public PMInvoiceInfoResponse getInvoiceIDByInvoiceNum(String invoiceNum,Context context) throws Exception {
 		PMInvoiceInfoResponse response = new FindPMInvoiceIDAction(logger).execute(invoiceNum);
+		context.getLogger().debug("getInvoiceIDByInvoiceNum->"+response.info().toString());
+
+		switch(response.getStatusCode()){
+			case PMInvoiceInfoResponse.STATUS_COMPLETE:{
+				break;
+			}
+			case PMInvoiceInfoResponse.STATUS_DATA_NOT_FOUND:{
+				break;
+			}
+			default:{
+				throw new Exception("Error : " + response.getErrorMsg());
+			}
+		}
+		
 		return response;
 	}
 
