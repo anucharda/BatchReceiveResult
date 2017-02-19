@@ -73,7 +73,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 				for (int j = 0; j < fileNames.length; j++) { // for loop file
 					String filePath = processPath +"/"+fileNames[j];
 					boolean successFile = false;
-					if (Constants.sffOKExt.indexOf(filePath) != 1) {// 5. Check
+					if (filePath.indexOf(Constants.sffOKExt) != -1) {// 5. Check
 						successFile = true;
 					}
 					if (!ValidateUtil.isNull(filePath)) {
@@ -122,30 +122,19 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 											// 4.Read Body File
 											UpdateResultSSFBean request = new UpdateResultSSFBean();
 											if (successFile) {
-												if (dataContentArr.length == 8) {
-													request.setMobileNo(dataContentArr[1]);
-													request.setOrderType(dataContentArr[2]);
-													request.setSuspendType(dataContentArr[3]);
-													request.setFileName(fileName);
-													request.setSffOrderNo(dataContentArr[7]);
-													request.setActionStatus(Constants.actSuccessStatus);
-												} else {
-													throw new Exception("Success File Wrong format body " + recordNum + ": "
-															+ dataContent);
-												}
+												request.setMobileNo(dataContentArr[1]);
+												request.setOrderType(dataContentArr[2]);
+												request.setSuspendType(dataContentArr[3]);
+												request.setFileName(fileName);
+												request.setSffOrderNo(dataContentArr[dataContentArr.length-1]);
+												request.setActionStatus(Constants.actSuccessStatus);
 											} else {
-												// Waiting format file
-												if (dataContentArr.length == 10) {
-													request.setMobileNo(dataContentArr[1]);
-													request.setOrderType(dataContentArr[2]);
-													request.setSuspendType(dataContentArr[3]);
-													request.setFileName(fileName);
-													request.setActionStatus(Constants.actFailStatus);
-													request.setFailReason(dataContentArr[8] + ":" + dataContentArr[9]);
-												} else {
-													throw new Exception("Fail File Wrong format body " + recordNum + ": "
-															+ dataContent);
-												}
+												request.setMobileNo(dataContentArr[1]);
+												request.setOrderType(dataContentArr[2]);
+												request.setSuspendType(dataContentArr[3]);
+												request.setFileName(fileName);
+												request.setActionStatus(Constants.actFailStatus);
+												request.setFailReason(dataContentArr[dataContentArr.length-1]);
 											}
 											request.setActionID(Utility.getActionID(jobType));
 											request.setBatchID(batchID);
@@ -201,10 +190,12 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 							int treatResult = 0;
 							if (incomplete) {
 								treatResult = Constants.treatIncompleteStatus;
-							} else if (failFlag) {
+							} else if (failFlag&!successFlag) {
 								treatResult = Constants.treatFailStatus;
-							} else {
+							} else if (!failFlag&successFlag) {
 								treatResult = Constants.treatSuccessStatus;
+							} else{
+								treatResult = Constants.treatIncompleteStatus;
 							}
 
 							/* Update Treatment */
