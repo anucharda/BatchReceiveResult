@@ -35,36 +35,40 @@ public class ReceiveWaiveBatchWorker {
 			if(doProcess){
 				File[] files = FileUtil.getAllFilesThatMatchFilenameExtensionAscendingOrder(inboundSyncPath, "sync");
 				context.getLogger().info("Sync file size --> "+files.length);
-				String syncFileName = "";
-				String dataFileName = "";
 				if(files!=null && files.length>0){
-					String syncFile = files[0].getPath();
-					context.getLogger().info("Sync file is --> "+syncFile);
-					syncFileName = files[0].getName();
-					dataFileName = syncFileName.replace(".sync", ".dat");
-					context.getLogger().info("Data File Name --> "+dataFileName);
-					File source = new File(inboundDataPath+"/"+dataFileName);
-					if(source.exists()){
-						File dest = new File(processPath+"/"+dataFileName);
-						FileUtil.copyFile(source, dest);
-						context.getLogger().info("Copy file to process directory successed --> "+dataFileName);
-						//Delete source file after copy to process directory completed.
-						if(source.delete()){
-							context.getLogger().info("Delete file from inbound directory successed --> "+source.getParent());
-						}else{
-							throw new Exception("Error occur delete file from inbound directory --> "+source.getParent());
+					//Loop for do all sync file.
+					for(int i=0; i<files.length; i++){
+						String doPath = processPath;
+						String syncFile = files[i].getPath();
+						context.getLogger().info("Sync file is --> "+syncFile);
+						String syncFileName = files[i].getName();
+						String dataFileName = syncFileName.replace(".sync", ".dat");
+						context.getLogger().info("Data File Name --> "+dataFileName);
+						File source = new File(inboundDataPath+"/"+dataFileName);
+						if(source.exists()){
+							File dest = new File(processPath+"/"+dataFileName);
+							FileUtil.copyFile(source, dest);
+							context.getLogger().info("Copy file to process directory successed --> "+dataFileName);
+							//Delete source file after copy to process directory completed.
+							if(source.delete()){
+								context.getLogger().info("Delete file from inbound directory successed --> "+source.getParent());
+							}else{
+								throw new Exception("Error occur delete file from inbound directory --> "+source.getParent());
+							}
 						}
+						File sourceSyncFile = new File(syncFile);
+						File destSyncFile = new File(processPath+"/"+syncFileName);
+						FileUtil.copyFile(sourceSyncFile, destSyncFile);
+						//Delete source file after copy to process directory completed.
+						if(sourceSyncFile.delete()){
+							context.getLogger().info("Delete file from inbound directory successed --> "+sourceSyncFile.getParent());
+						}else{
+							throw new Exception("Error occur delete file from inbound directory --> "+sourceSyncFile.getParent());
+						}
+						//New thread for execute process.
+						new Thread ( () -> execute(context, doPath, syncFileName, dataFileName) ).start();
 					}
-					File sourceSyncFile = new File(syncFile);
-					File destSyncFile = new File(processPath+"/"+syncFileName);
-					FileUtil.copyFile(sourceSyncFile, destSyncFile);
-					//Delete source file after copy to process directory completed.
-					if(sourceSyncFile.delete()){
-						context.getLogger().info("Delete file from inbound directory successed --> "+sourceSyncFile.getParent());
-					}else{
-						throw new Exception("Error occur delete file from inbound directory --> "+sourceSyncFile.getParent());
-					}
-					execute(context,  processPath,syncFileName,dataFileName);
+
 				}else{
 					context.getLogger().info("Not found sync file in directory --> "+inboundSyncPath);
 				}

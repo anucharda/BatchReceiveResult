@@ -11,10 +11,16 @@ import org.apache.commons.io.comparator.LastModifiedFileComparator;
 public class FileUtil {
 	
 	@SuppressWarnings("unchecked")
-	public static File[] getAllFilesThatMatchFilenameExtensionAscendingOrder(String path, String fileExtension) throws Exception{
-		File dir = new File(path);
-		File[] files = dir.listFiles((d, name) -> name.endsWith("."+fileExtension));
+	public static File[] getAllFilesThatMatchFilenameExtensionAscendingOrder(String filePath, String extension) throws Exception{
+		File dir = new File(filePath);
+		File[] files = dir.listFiles((d, name) -> name.endsWith("."+extension));
 		Arrays.sort(files, LastModifiedFileComparator.LASTMODIFIED_COMPARATOR);
+		return files;
+	}
+	
+	public static File[] getAllFileThatMatchFilenameExtension(String filePath, String extension) throws Exception{
+		File dir = new File(filePath);
+		File[] files = dir.listFiles((d, name) -> name.endsWith("."+extension));
 		return files;
 	}
 	
