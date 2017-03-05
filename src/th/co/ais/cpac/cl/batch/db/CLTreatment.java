@@ -57,7 +57,6 @@ public class CLTreatment {
 				sql.append(", ACTION_REMARK   ='").append(failReason).append("'").append(Constants.END_LINE);
 			}
 			sql.append(" WHERE TREATMENT_ID  = ").append(treatmentID).append(Constants.END_LINE);
-			sql.append(" AND ACTION_STATUS   = ").append(Constants.treatProgressStatus).append(Constants.END_LINE);
 			return sql;
 		}
 
