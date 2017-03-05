@@ -11,7 +11,7 @@ public class ReceiveSFFWorker {
 
 	public static void main(String[] args) {
 		Context context = new Context();
-		//context.initailLogger(name, header);
+		//context.initailLogger(name, header); 
 		try{
 			
 			context.initailLogger("LoggerReceive", "XXXX|YYYYY");
