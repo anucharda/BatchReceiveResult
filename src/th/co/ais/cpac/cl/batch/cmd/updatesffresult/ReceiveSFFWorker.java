@@ -88,6 +88,7 @@ public class ReceiveSFFWorker {
 						}
 						//New thread for execute process.
 						new Thread ( () -> execute(context, jobType,fileNames,doPath) ).start();
+						//execute(context, jobType,fileNames,doPath);
 					}
 
 				}else{

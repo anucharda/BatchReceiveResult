@@ -5,6 +5,7 @@
  */
 package th.co.ais.cpac.cl.batch;
 
+import th.co.ais.cpac.cl.batch.Constants.Environment;
 import th.co.ais.cpac.cl.batch.cnf.CNFDatabase;
 import th.co.ais.cpac.cl.common.UtilityLogger;
 import th.co.ais.cpac.cl.template.database.DBConnectionPools;
@@ -61,5 +62,30 @@ public class Constants {
 		CNFDatabase cnf = new CNFDatabase();
 		return new DBConnectionPools<>(cnf, logger);
 	}
-	
+	  public enum Environment {
+		    PROD(1),
+		    DEV(2),
+		    SIT(3),
+		    UnKnow(-9999);
+		    private final int code;
+
+		    private Environment(int code) {
+		      this.code = code;
+		    }
+
+		    public int getCode() {
+		      return code;
+		    }
+		  }
+
+		  public static final Environment mapEnvironment(int code) {
+		    if (Environment.PROD.getCode() == code) {
+		      return Environment.PROD;
+		    } else if (Environment.DEV.getCode() == code) {
+		      return Environment.DEV;
+		    } else if (Environment.SIT.getCode() == code) {
+		      return Environment.SIT;
+		    }
+		    return Environment.UnKnow;
+		  }
 }

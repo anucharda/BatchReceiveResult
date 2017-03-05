@@ -6,6 +6,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import th.co.ais.cpac.cl.batch.Constants;
+import th.co.ais.cpac.cl.batch.db.CLBatch.CLBatchPathInfo;
+import th.co.ais.cpac.cl.batch.db.CLBatch.CLBatchPathResponse;
+import th.co.ais.cpac.cl.batch.db.CLBatch.GetCLBatchPath;
 import th.co.ais.cpac.cl.common.Context;
 import th.co.ais.cpac.cl.common.UtilityLogger;
 import th.co.ais.cpac.cl.template.database.DBConnectionPools;
@@ -41,15 +44,31 @@ public class CLBatch {
 	public class CLBatchInfo {
 		protected CLBatchInfo() {
 		}
-
+		private int batchVersionNo;
 		private BigDecimal batchId;
-
+		private BigDecimal batchTypeId;
 		public BigDecimal getBatchId() {
 			return batchId;
 		}
 
 		public void setBatchId(BigDecimal batchId) {
 			this.batchId = batchId;
+		}
+
+		public BigDecimal getBatchTypeId() {
+			return batchTypeId;
+		}
+
+		public void setBatchTypeId(BigDecimal batchTypeId) {
+			this.batchTypeId = batchTypeId;
+		}
+
+		public int getBatchVersionNo() {
+			return batchVersionNo;
+		}
+
+		public void setBatchVersionNo(int batchVersionNo) {
+			this.batchVersionNo = batchVersionNo;
 		}
 
 	}
@@ -81,7 +100,7 @@ public class CLBatch {
 		protected StringBuilder createSqlProcess() {
 			StringBuilder sql = new StringBuilder();
 			sql.append(" SELECT").append(Constants.END_LINE);
-			sql.append(" BATCH_ID ").append(Constants.END_LINE);
+			sql.append(" BATCH_ID,BATCH_TYPE_ID,BATCH_VERSION_NO ").append(Constants.END_LINE);
 			sql.append(" FROM dbo.CL_BATCH ").append(Constants.END_LINE);
 			sql.append(" WHERE BATCH_FILE_NAME = ('").append(fileName).append("') ").append(Constants.END_LINE);
 			sql.append(" and INBOUND_STATUS = (").append(inboundStatus).append(")").append(Constants.END_LINE);
@@ -92,6 +111,8 @@ public class CLBatch {
 		protected void setReturnValue(ResultSet resultSet) throws SQLException {
 			CLBatchInfo temp = new CLBatchInfo();
 			temp.setBatchId(resultSet.getBigDecimal("BATCH_ID"));
+			temp.setBatchTypeId(resultSet.getBigDecimal("BATCH_TYPE_ID"));
+			temp.setBatchVersionNo(resultSet.getInt("BATCH_VERSION_NO"));
 			response.getResponse().add(temp);
 		}
 
@@ -232,4 +253,99 @@ public class CLBatch {
 		
 		return response;
 	}
+	
+	 public class CLBatchPathInfo {
+
+		    protected CLBatchPathInfo() {
+		    }
+		    private BigDecimal batchTypeId;
+		    private Constants.Environment environment;
+		    private String pathOutbound;
+		    private String pathInbound;
+
+		    public BigDecimal getBatchTypeId() {
+		      return batchTypeId;
+		    }
+
+		    public void setBatchTypeId(BigDecimal batchTypeId) {
+		      this.batchTypeId = batchTypeId;
+		    }
+
+		    public Constants.Environment getEnvironment() {
+		      return environment;
+		    }
+
+		    public void setEnvironment(Constants.Environment environment) {
+		      this.environment = environment;
+		    }
+
+		    public String getPathOutbound() {
+		      return pathOutbound;
+		    }
+
+		    public void setPathOutbound(String pathOutbound) {
+		      this.pathOutbound = pathOutbound;
+		    }
+
+		    public String getPathInbound() {
+		      return pathInbound;
+		    }
+
+		    public void setPathInbound(String pathInbound) {
+		      this.pathInbound = pathInbound;
+		    }
+
+		  }
+
+		  public class CLBatchPathResponse extends DBTemplatesResponse< CLBatchPathInfo> {
+
+		    @Override
+		    protected CLBatchPathInfo createResponse() {
+		      return new CLBatchPathInfo();
+		    }
+
+		  }
+
+		  protected class GetCLBatchPath extends DBTemplatesExecuteQuery<CLBatchPathResponse, UtilityLogger, DBConnectionPools> {
+
+		    public GetCLBatchPath(UtilityLogger logger) {
+		      super(logger);
+		    }
+
+		    @Override
+		    protected CLBatchPathResponse createResponse() {
+		      return new CLBatchPathResponse();
+		    }
+
+		    //
+		    @Override
+		    protected StringBuilder createSqlProcess() {
+		      StringBuilder sql = new StringBuilder();
+		      sql.append(" SELECT BATCH_TYPE_ID, ENVIRONMENT, PATH_OUTBOUND, PATH_INBOUND, RECORD_STATUS ");
+		      sql.append(" FROM dbo.CL_BATCH_PATH ");
+		      sql.append(" WHERE BATCH_TYPE_ID = ").append(batchTypeId.toPlainString()).append(" and RECORD_STATUS = 1 ");
+		      return sql;
+		    }
+
+		    private BigDecimal batchTypeId;
+
+		    @Override
+		    protected void setReturnValue(ResultSet resultSet) throws SQLException {
+		      CLBatchPathInfo temp = response.getResponse();
+		      temp.setBatchTypeId(resultSet.getBigDecimal("BATCH_TYPE_ID"));
+		      temp.setEnvironment(Constants.mapEnvironment(resultSet.getBigDecimal("ENVIRONMENT").intValue()));
+		      temp.setPathOutbound(resultSet.getString("PATH_OUTBOUND"));
+		      temp.setPathInbound(resultSet.getString("PATH_INBOUND"));
+		    }
+
+		    protected CLBatchPathResponse execute(BigDecimal batchTypeId) {
+		      this.batchTypeId = batchTypeId;
+		      return executeQuery(Constants.getDBConnectionPools(logger), true);
+		    }
+
+		  }
+
+		  public CLBatchPathResponse getCLBatchPath(BigDecimal batchTypeId) {
+		    return new GetCLBatchPath(logger).execute(batchTypeId);
+		  }
 }

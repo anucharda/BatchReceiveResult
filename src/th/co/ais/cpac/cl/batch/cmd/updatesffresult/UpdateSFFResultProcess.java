@@ -94,7 +94,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 										// 3.Find Batch ID & Update Batch to Receive
 										// Status from header file
 										
-										if (dataContent.indexOf("01|") != -1) {// && !firstFile
+										if ("01".equals(dataContentArr[0])) {// && !firstFile
 											if (dataContentArr.length == 2) {
 												// 3.1.Find BATCH_ID From File Name
 												// -> ที่ INBOUND_STATUS =1
@@ -118,7 +118,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 											} else {
 												throw new Exception("Wrong format header : " + dataContent);
 											}
-										} else if (dataContent.indexOf("02|") != -1) {
+										} else if ("02".equals(dataContentArr[0])) {
 											// 4.Read Body File
 											UpdateResultSSFBean request = new UpdateResultSSFBean();
 											if (successFile) {
@@ -144,7 +144,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 												treatmentIDlist.put(orderInfo.getTreatementId(), "");
 											}
 											recordNum++;
-										} else if (dataContent.indexOf("09|") != -1) {
+										} else if ("09".equals(dataContentArr[0])) {
 											context.getLogger().info("Footer Data : "+dataContent);
 										}else {
 											context.getLogger().info("Wrong record type : "+dataContent);
