@@ -43,13 +43,21 @@ public class ReceiveSFFWorker {
 				doProcess=false;
 				context.getLogger().info("not found job type : "+jobType);
 			}
+
 			if(doProcess){
 				File[] files = FileUtil.getAllFilesThatMatchFilenameExtensionAscendingOrder(inboundSyncPath, "sync");
 				context.getLogger().info("Sync file size --> "+files.length);
 				String syncFileName = "";
+
 				if(files!=null && files.length>0){
+					
+					int totalThread=Integer.parseInt(reader.get("sff.total.thread"));
+					int loopCnt=files.length;
+					if(files.length>totalThread){
+						loopCnt=totalThread;
+					}
 					//Loop for do all sync file.
-					for(int i=0; i<files.length; i++){
+					for(int i=0; i<loopCnt; i++){
 						String doPath = processPath;
 						String syncFile = files[i].getPath();
 						syncFileName = files[i].getName();

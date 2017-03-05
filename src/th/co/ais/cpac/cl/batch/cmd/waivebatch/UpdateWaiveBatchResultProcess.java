@@ -79,9 +79,9 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 						if (dataContentArr != null && dataContentArr.length > 0) {
 							// 3.Find Batch ID & Update Batch to Receive
 							// Status from header file
-							if (dataContent.indexOf("01|") != -1) {
+							if ("01".equals(dataContentArr[0])) {
 								context.getLogger().info("Header Data : " + dataContent);
-							} else if (dataContent.indexOf("02|") != -1) {
+							} else if ("02".equals(dataContentArr[0])) {
 								// 4.Read Body File
 								// 4.1 Read per record
 								if (dataContentArr.length == 19) {
@@ -117,7 +117,7 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 									throw new Exception("File Wrong format body " + recordNum + ": " + dataContent);
 								}
 								recordNum++;
-							} else if (dataContent.indexOf("09|") != -1) {
+							} else if ("09".equals(dataContentArr[0])) {
 								context.getLogger().info("Footer Data : " + dataContent);
 							} else {
 								context.getLogger().info("Wrong record type : " + dataContent);
