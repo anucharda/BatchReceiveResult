@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import th.co.ais.cpac.cl.batch.Constants;
+import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
 import th.co.ais.cpac.cl.batch.db.CLBatch.CLBatchPathInfo;
 import th.co.ais.cpac.cl.batch.db.CLBatch.CLBatchPathResponse;
 import th.co.ais.cpac.cl.batch.db.CLBatch.GetCLBatchPath;
@@ -99,11 +99,11 @@ public class CLBatch {
 		@Override
 		protected StringBuilder createSqlProcess() {
 			StringBuilder sql = new StringBuilder();
-			sql.append(" SELECT").append(Constants.END_LINE);
-			sql.append(" BATCH_ID,BATCH_TYPE_ID,BATCH_VERSION_NO ").append(Constants.END_LINE);
-			sql.append(" FROM dbo.CL_BATCH ").append(Constants.END_LINE);
-			sql.append(" WHERE BATCH_FILE_NAME = ('").append(fileName).append("') ").append(Constants.END_LINE);
-			sql.append(" and INBOUND_STATUS = (").append(inboundStatus).append(")").append(Constants.END_LINE);
+			sql.append(" SELECT").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" BATCH_ID,BATCH_TYPE_ID,BATCH_VERSION_NO ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" FROM dbo.CL_BATCH ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" WHERE BATCH_FILE_NAME = ('").append(fileName).append("') ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" and INBOUND_STATUS = (").append(inboundStatus).append(")").append(ConstantsBatchReceiveResult.END_LINE);
 			return sql;
 		}
 
@@ -119,7 +119,7 @@ public class CLBatch {
 		protected CLBatchInfoResponse execute(int inboundStatus, String fileName) {
 			this.inboundStatus = inboundStatus;
 			this.fileName = fileName;
-			return executeQuery(Constants.getDBConnectionPools(logger), true);
+			return executeQuery(ConstantsBatchReceiveResult.getDBConnectionPools(logger), true);
 		}
 		
 	}
@@ -164,12 +164,12 @@ public class CLBatch {
 		@Override
 		protected StringBuilder createSqlProcess() {
 			StringBuilder sql = new StringBuilder();
-			sql.append("UPDATE dbo.CL_BATCH ").append(Constants.END_LINE);
-			sql.append("SET LAST_UPD= getdate() , LAST_UPD_BY='").append(username).append("'").append(Constants.END_LINE);
-			sql.append(",RESPONSE_FILE_NAME = '").append(fileName).append("'").append(Constants.END_LINE);
-			sql.append(",INBOUND_STATUS = ").append(inboundStatus).append(Constants.END_LINE);
-			sql.append(", INBOUND_STATUS_DTM = getdate() ").append(Constants.END_LINE);
-			sql.append(" WHERE BATCH_ID = ").append(batchID).append(Constants.END_LINE);
+			sql.append("UPDATE dbo.CL_BATCH ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append("SET LAST_UPD= getdate() , LAST_UPD_BY='").append(username).append("'").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(",RESPONSE_FILE_NAME = '").append(fileName).append("'").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(",INBOUND_STATUS = ").append(inboundStatus).append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(", INBOUND_STATUS_DTM = getdate() ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" WHERE BATCH_ID = ").append(batchID).append(ConstantsBatchReceiveResult.END_LINE);
 			return sql;
 		}
 
@@ -179,7 +179,7 @@ public class CLBatch {
 			this.batchID = batchID;
 			this.fileName = fileName;
 			this.username = username;
-			return executeUpdate(Constants.getDBConnectionPools(logger), true);
+			return executeUpdate(ConstantsBatchReceiveResult.getDBConnectionPools(logger), true);
 		}
 	}
 
@@ -218,11 +218,11 @@ public class CLBatch {
 		@Override
 		protected StringBuilder createSqlProcess() {
 			StringBuilder sql = new StringBuilder();
-			sql.append("UPDATE dbo.CL_BATCH ").append(Constants.END_LINE);
-			sql.append("SET LAST_UPD= getdate() , LAST_UPD_BY='").append(username).append("'").append(Constants.END_LINE);
-			sql.append(",INBOUND_STATUS = ").append(Constants.batchCompleteStatus).append(Constants.END_LINE);
-			sql.append(", INBOUND_STATUS_DTM = getdate() ").append(Constants.END_LINE);
-			sql.append(" WHERE BATCH_ID = ").append(batchID).append(Constants.END_LINE);
+			sql.append("UPDATE dbo.CL_BATCH ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append("SET LAST_UPD= getdate() , LAST_UPD_BY='").append(username).append("'").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(",INBOUND_STATUS = ").append(ConstantsBatchReceiveResult.batchCompleteStatus).append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(", INBOUND_STATUS_DTM = getdate() ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" WHERE BATCH_ID = ").append(batchID).append(ConstantsBatchReceiveResult.END_LINE);
 			return sql;
 		}
 
@@ -230,7 +230,7 @@ public class CLBatch {
 		protected ExecuteResponse execute(BigDecimal batchID,String username) {
 			this.batchID = batchID;
 			this.username = username;
-			return executeUpdate(Constants.getDBConnectionPools(logger), true);
+			return executeUpdate(ConstantsBatchReceiveResult.getDBConnectionPools(logger), true);
 		}
 	}
 
@@ -259,7 +259,7 @@ public class CLBatch {
 		    protected CLBatchPathInfo() {
 		    }
 		    private BigDecimal batchTypeId;
-		    private Constants.Environment environment;
+		    private ConstantsBatchReceiveResult.Environment environment;
 		    private String pathOutbound;
 		    private String pathInbound;
 
@@ -271,11 +271,11 @@ public class CLBatch {
 		      this.batchTypeId = batchTypeId;
 		    }
 
-		    public Constants.Environment getEnvironment() {
+		    public ConstantsBatchReceiveResult.Environment getEnvironment() {
 		      return environment;
 		    }
 
-		    public void setEnvironment(Constants.Environment environment) {
+		    public void setEnvironment(ConstantsBatchReceiveResult.Environment environment) {
 		      this.environment = environment;
 		    }
 
@@ -333,14 +333,14 @@ public class CLBatch {
 		    protected void setReturnValue(ResultSet resultSet) throws SQLException {
 		      CLBatchPathInfo temp = response.getResponse();
 		      temp.setBatchTypeId(resultSet.getBigDecimal("BATCH_TYPE_ID"));
-		      temp.setEnvironment(Constants.mapEnvironment(resultSet.getBigDecimal("ENVIRONMENT").intValue()));
+		      temp.setEnvironment(ConstantsBatchReceiveResult.mapEnvironment(resultSet.getBigDecimal("ENVIRONMENT").intValue()));
 		      temp.setPathOutbound(resultSet.getString("PATH_OUTBOUND"));
 		      temp.setPathInbound(resultSet.getString("PATH_INBOUND"));
 		    }
 
 		    protected CLBatchPathResponse execute(BigDecimal batchTypeId) {
 		      this.batchTypeId = batchTypeId;
-		      return executeQuery(Constants.getDBConnectionPools(logger), true);
+		      return executeQuery(ConstantsBatchReceiveResult.getDBConnectionPools(logger), true);
 		    }
 
 		  }

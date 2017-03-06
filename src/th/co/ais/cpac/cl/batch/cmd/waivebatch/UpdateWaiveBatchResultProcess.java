@@ -6,7 +6,7 @@ import java.io.FileReader;
 import java.math.BigDecimal;
 import java.util.HashMap;
 
-import th.co.ais.cpac.cl.batch.Constants;
+import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
 import th.co.ais.cpac.cl.batch.bean.UpdateResultSSFBean;
 import th.co.ais.cpac.cl.batch.bean.UpdateResultWaiveBatchBean;
 import th.co.ais.cpac.cl.batch.cnf.CNFDatabase;
@@ -22,6 +22,7 @@ import th.co.ais.cpac.cl.batch.db.PMBatchAdjDtl.PMBatchAdjInfoResponse;
 import th.co.ais.cpac.cl.batch.db.PMInvoice;
 import th.co.ais.cpac.cl.batch.db.PMInvoice.PMInvoiceInfoResponse;
 import th.co.ais.cpac.cl.batch.template.ProcessTemplate;
+import th.co.ais.cpac.cl.batch.util.FileUtil;
 import th.co.ais.cpac.cl.batch.util.Utility;
 import th.co.ais.cpac.cl.batch.util.ValidateUtil;
 import th.co.ais.cpac.cl.common.Context;
@@ -32,9 +33,14 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 	@Override
 	protected String getPathDatabase() {
 		// TODO Auto-generated method stub
-		return Constants.cldbConfPath;
+		String dbPath="";
+		try{
+			dbPath=FileUtil.getDBPath();
+		}catch(Exception e){
+			context.getLogger().info("Error->"+e.getMessage()+": "+e.getCause().toString());
+		}
+		return  dbPath;
 	}
-
 	public void executeProcess(Context context, String processPath,String syncFileName,String inboundFileName) { // suspendJobType=S,terminateJobType=T,reconnectJobType=R
 		execute();
 		readFile(context, processPath,syncFileName,inboundFileName);
@@ -47,7 +53,7 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 
 		try {
 			context.getLogger().info("Start WorkerReceive....");
-			context.getLogger().info("jobType->" + Utility.getJobName(Constants.waiveBatchJobType));
+			context.getLogger().info("jobType->" + Utility.getJobName(ConstantsBatchReceiveResult.waiveBatchJobType));
 			context.getLogger().info("SyncFileName->" + syncFileName);
 			/***** START LOOP ******/
 			// 1.Rename file.sync to .dat
@@ -55,11 +61,11 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 			BigDecimal batchID = null;
 			// 2. Find Batch ID by fileDatExtName
 			CLBatch batchDB = new CLBatch(context.getLogger());
-			CLBatchInfo result = batchDB.getBatchInfoByFileName(Constants.batchInprogressStatus, inboundFileName,context);
-			String username = Utility.getusername(Constants.waiveBatchJobType);
+			CLBatchInfo result = batchDB.getBatchInfoByFileName(ConstantsBatchReceiveResult.batchInprogressStatus, inboundFileName,context);
+			String username = Utility.getusername(ConstantsBatchReceiveResult.waiveBatchJobType);
 			if (result != null) {
 				batchID = result.getBatchId();
-				batchDB.updateInboundReceiveStatus(Constants.batchReceiveStatus, batchID, syncFileName, username,context);
+				batchDB.updateInboundReceiveStatus(ConstantsBatchReceiveResult.batchReceiveStatus, batchID, syncFileName, username,context);
 
 			} else {
 				throw new Exception("Not Find Batch ID : " + inboundFileName);
@@ -75,7 +81,7 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 				while ((sCurrentLine = br.readLine()) != null) {
 					String dataContent = sCurrentLine;
 					if (!ValidateUtil.isNull(dataContent)) {
-						String[] dataContentArr = dataContent.split(Constants.PIPE);
+						String[] dataContentArr = dataContent.split(ConstantsBatchReceiveResult.PIPE);
 						if (dataContentArr != null && dataContentArr.length > 0) {
 							// 3.Find Batch ID & Update Batch to Receive
 							// Status from header file
@@ -92,11 +98,11 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 									request.setAmount(new BigDecimal(dataContentArr[15]));
 									request.setFileName(syncFileName);
 									if ("Y".equals(dataContentArr[16])) {
-										request.setActionStatus(Constants.actSuccessStatus);
-										request.setAdjStatus(Constants.adjCompleteStatus);
+										request.setActionStatus(ConstantsBatchReceiveResult.actSuccessStatus);
+										request.setAdjStatus(ConstantsBatchReceiveResult.adjCompleteStatus);
 									} else {
-										request.setActionStatus(Constants.actFailStatus);
-										request.setAdjStatus(Constants.adjFailStatus);
+										request.setActionStatus(ConstantsBatchReceiveResult.actFailStatus);
+										request.setAdjStatus(ConstantsBatchReceiveResult.adjFailStatus);
 										request.setFailReason(dataContentArr[17] + ":" + dataContentArr[18]);
 									}
 									// 4.2 Find INVOICE_ID
@@ -149,9 +155,9 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 						boolean incomplete = false;
 						for (int i = 0; i < waiveResult.getResponse().size(); i++) {
 							CLWaiveTreatementInfo waiveTreat = waiveResult.getResponse().get(i);
-							if (waiveTreat.getActStatus() == Constants.actSuccessStatus) {
+							if (waiveTreat.getActStatus() == ConstantsBatchReceiveResult.actSuccessStatus) {
 								successFlag = true;
-							} else if (waiveTreat.getActStatus() == Constants.actFailStatus) {
+							} else if (waiveTreat.getActStatus() == ConstantsBatchReceiveResult.actFailStatus) {
 								failFlag = true;
 							} else {
 								incomplete = true;
@@ -160,11 +166,11 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 						/* Summary Status */
 						int treatResult = 0;
 						if (incomplete) {
-							treatResult = Constants.treatIncompleteStatus;
+							treatResult = ConstantsBatchReceiveResult.treatIncompleteStatus;
 						} else if (failFlag) {
-							treatResult = Constants.treatFailStatus;
+							treatResult = ConstantsBatchReceiveResult.treatFailStatus;
 						} else {
-							treatResult = Constants.treatSuccessStatus;
+							treatResult = ConstantsBatchReceiveResult.treatSuccessStatus;
 						}
 
 						/* Update Treatment */
@@ -229,7 +235,7 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 		CLWaive tbl = new CLWaive(context.getLogger());
 
 		waiveInfo = tbl.getWaiveTreatementInfo(request.getBaNo(), request.getBatchID(), request.getInvoiceID(),
-				Constants.actInprogressStatus,context);
+				ConstantsBatchReceiveResult.actInprogressStatus,context);
 		if (waiveInfo != null) {
 			tbl.updateWaiveStatus(request.getBaNo(), request.getBatchID(), request.getInvoiceID(),
 					request.getBatchAdjDtlID(), request.getActionStatus(), request.getFailReason(), username,context);

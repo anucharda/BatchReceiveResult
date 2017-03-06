@@ -5,7 +5,6 @@
  */
 package th.co.ais.cpac.cl.batch;
 
-import th.co.ais.cpac.cl.batch.Constants.Environment;
 import th.co.ais.cpac.cl.batch.cnf.CNFDatabase;
 import th.co.ais.cpac.cl.common.UtilityLogger;
 import th.co.ais.cpac.cl.template.database.DBConnectionPools;
@@ -14,9 +13,7 @@ import th.co.ais.cpac.cl.template.database.DBConnectionPools;
  *
  * @author Sirirat
  */
-public class Constants {
-
-	public static String dbPath = "c:\\cpac\\database.properties";
+public class ConstantsBatchReceiveResult {
 
 	public static int suspendOrderActionID = 10;//dummy 
 	public static int terminateOrderActionID = 4;
@@ -55,8 +52,6 @@ public class Constants {
 	public static String sffErrExt =".err";
 	public static String writeOffSuccess ="S";
 	public static String writeOffFail ="E";
-	public static String cldbConfPath ="C:\\cpac\\database.properties";
-	public static String pmdbConfPath ="C:\\cpac\\pmDatabase.properties";
 
 	public static DBConnectionPools getDBConnectionPools(UtilityLogger logger) {
 		CNFDatabase cnf = new CNFDatabase();

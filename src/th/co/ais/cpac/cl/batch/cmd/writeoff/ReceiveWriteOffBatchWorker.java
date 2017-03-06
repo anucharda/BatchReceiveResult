@@ -2,7 +2,7 @@ package th.co.ais.cpac.cl.batch.cmd.writeoff;
 
 import java.io.File;
 
-import th.co.ais.cpac.cl.batch.Constants;
+import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
 import th.co.ais.cpac.cl.batch.util.FileUtil;
 import th.co.ais.cpac.cl.batch.util.PropertiesReader;
 import th.co.ais.cpac.cl.common.Context;
@@ -12,18 +12,18 @@ public class ReceiveWriteOffBatchWorker {
 	public static void main(String[] args) {
 		try{
 			 Context context = new Context();
-				context.initailLogger("LoggerReceiveSFFWorker", "XXXX|YYYYY");
+				context.initailLogger("LoggerReceiveSFFWorker", "ReceiveWriteOffBatchWorker");
 				// TODO Auto-generated method stub
 				context.getLogger().info("----------------------- Start ReceiveWriteOffBatchWorker -----------------------");
 				context.getLogger().info("Load configure....");
-				PropertiesReader reader = new PropertiesReader("th.co.ais.cpac.cl.batch", "SystemConfigPath");
+				PropertiesReader reader = new PropertiesReader("th.co.ais.cpac.cl.batch.properties.resource", "SystemConfigPath");
 				// suspendJobType=S,terminateJobType=T,reconnectJobType=R
 				String jobType = args[0];// From Parameter
 				boolean doProcess=true;
 				String inboundAckPath="" ;
 				String inboundDataPath="" ;
 				String processPath="";
-				if(Constants.writeOffJobType.equals(jobType)){
+				if(ConstantsBatchReceiveResult.writeOffJobType.equals(jobType)){
 					inboundAckPath= reader.get("writeOff.inboundAckPath");
 					inboundDataPath =reader.get("writeOff.inboundDataPath");
 					processPath = reader.get("writeOff.processPath");

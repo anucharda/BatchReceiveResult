@@ -5,7 +5,7 @@ import java.io.FileReader;
 import java.math.BigDecimal;
 import java.util.HashMap;
 
-import th.co.ais.cpac.cl.batch.Constants;
+import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
 import th.co.ais.cpac.cl.batch.bean.UpdateResultSSFBean;
 import th.co.ais.cpac.cl.batch.db.CLBatch;
 import th.co.ais.cpac.cl.batch.db.CLBatch.CLBatchInfo;
@@ -23,7 +23,13 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 	@Override
 	protected String getPathDatabase() {
 		// TODO Auto-generated method stub
-		return Constants.cldbConfPath;
+		String dbPath="";
+		try{
+			dbPath=FileUtil.getDBPath();
+		}catch(Exception e){
+			context.getLogger().info("Error->"+e.getMessage()+": "+e.getCause().toString());
+		}
+		return  dbPath;
 	}
 
 	public void executeProcess(Context context, String jobType, String[] fileNames,String processPath) { // suspendJobType=S,terminateJobType=T,reconnectJobType=R
@@ -44,8 +50,8 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 			context.getLogger().info("jobType->" +  Utility.getJobName(jobType));
 			context.getLogger().info("fileNames->" + fileNames.toString());
 
-			if (Constants.suspendJobType.equals(jobType) || Constants.terminateJobType.equals(jobType)
-					|| Constants.reconnectJobType.equals(jobType)) {
+			if (new ConstantsBatchReceiveResult().suspendJobType.equals(jobType) || ConstantsBatchReceiveResult.terminateJobType.equals(jobType)
+					|| ConstantsBatchReceiveResult.reconnectJobType.equals(jobType)) {
 
 				/***** START LOOP ******/
 				// 1.for loop file ใน Sync
@@ -57,9 +63,9 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 				// 2. อ่านชื่อไฟล์จากไฟล์ .sync
 				for(int i=0;i<fileNames.length;i++) {// อ่านไฟล์ sync
 					String outputFileName = fileNames[i];
-					if (outputFileName.indexOf(Constants.sffOKExt) != -1) {
+					if (outputFileName.indexOf(ConstantsBatchReceiveResult.sffOKExt) != -1) {
 						batchFileName = batchFileName + outputFileName;
-					} else if (outputFileName.indexOf(Constants.sffErrExt) != -1) {
+					} else if (outputFileName.indexOf(ConstantsBatchReceiveResult.sffErrExt) != -1) {
 						batchFileName = batchFileName +":"+ outputFileName;
 					} else {
 						context.getLogger().info("File extension not support->" + outputFileName);
@@ -73,7 +79,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 				for (int j = 0; j < fileNames.length; j++) { // for loop file
 					String filePath = processPath +"/"+fileNames[j];
 					boolean successFile = false;
-					if (filePath.indexOf(Constants.sffOKExt) != -1) {// 5. Check
+					if (filePath.indexOf(ConstantsBatchReceiveResult.sffOKExt) != -1) {// 5. Check
 						successFile = true;
 					}
 					if (!ValidateUtil.isNull(filePath)) {
@@ -89,7 +95,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 							while ((sCurrentLine = br.readLine()) != null) {
 								String dataContent = sCurrentLine;
 								if (!ValidateUtil.isNull(dataContent)) {
-									String[] dataContentArr = dataContent.split(Constants.PIPE);
+									String[] dataContentArr = dataContent.split(ConstantsBatchReceiveResult.PIPE);
 									if (dataContentArr != null && dataContentArr.length > 0) {
 										// 3.Find Batch ID & Update Batch to Receive
 										// Status from header file
@@ -102,13 +108,13 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 											
 												if(!firstFile){
 													CLBatch batchDB = new CLBatch(context.getLogger());
-													CLBatchInfo result = batchDB.getBatchInfoByFileName(Constants.batchInprogressStatus, fileName,context);
+													CLBatchInfo result = batchDB.getBatchInfoByFileName(ConstantsBatchReceiveResult.batchInprogressStatus, fileName,context);
 
 													if (result != null) {
 													// 3.2 Update Batch Status to
 													// Receive
 														batchID = result.getBatchId();
-														batchDB.updateInboundReceiveStatus(Constants.batchReceiveStatus,
+														batchDB.updateInboundReceiveStatus(ConstantsBatchReceiveResult.batchReceiveStatus,
 															batchID, batchFileName, username,context);
 														firstFile = true;
 													} else {
@@ -127,13 +133,13 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 												request.setSuspendType(dataContentArr[3]);
 												request.setFileName(fileName);
 												request.setSffOrderNo(dataContentArr[dataContentArr.length-1]);
-												request.setActionStatus(Constants.actSuccessStatus);
+												request.setActionStatus(ConstantsBatchReceiveResult.actSuccessStatus);
 											} else {
 												request.setMobileNo(dataContentArr[1]);
 												request.setOrderType(dataContentArr[2]);
 												request.setSuspendType(dataContentArr[3]);
 												request.setFileName(fileName);
-												request.setActionStatus(Constants.actFailStatus);
+												request.setActionStatus(ConstantsBatchReceiveResult.actFailStatus);
 												request.setFailReason(dataContentArr[dataContentArr.length-1]);
 											}
 											request.setActionID(Utility.getActionID(jobType));
@@ -178,9 +184,9 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 							boolean incomplete = false;
 							for (int i = 0; i < orderResult.getResponse().size(); i++) {
 								CLOrderTreatementInfo orderTreat = orderResult.getResponse().get(i);
-								if (orderTreat.getActStatus() == Constants.actSuccessStatus) {
+								if (orderTreat.getActStatus() == ConstantsBatchReceiveResult.actSuccessStatus) {
 									successFlag = true;
-								} else if (orderTreat.getActStatus() == Constants.actFailStatus) {
+								} else if (orderTreat.getActStatus() == ConstantsBatchReceiveResult.actFailStatus) {
 									failFlag = true;
 								} else {
 									incomplete = true;
@@ -189,13 +195,13 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 							/* Summary Status */
 							int treatResult = 0;
 							if (incomplete) {
-								treatResult = Constants.treatIncompleteStatus;
+								treatResult = ConstantsBatchReceiveResult.treatIncompleteStatus;
 							} else if (failFlag&!successFlag) {
-								treatResult = Constants.treatFailStatus;
+								treatResult = ConstantsBatchReceiveResult.treatFailStatus;
 							} else if (!failFlag&successFlag) {
-								treatResult = Constants.treatSuccessStatus;
+								treatResult = ConstantsBatchReceiveResult.treatSuccessStatus;
 							} else{
-								treatResult = Constants.treatIncompleteStatus;
+								treatResult = ConstantsBatchReceiveResult.treatIncompleteStatus;
 							}
 
 							/* Update Treatment */
@@ -231,7 +237,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 		// Criteria ORDER_ACTION_ID = Suspend,Reconnect,Terminate Action_status=
 		// inprocess
 		orderInfo = tbl.getOrderTreatementInfo(request.getMobileNo(), request.getBatchID(),
-				Constants.actInprogressStatus,context);
+				ConstantsBatchReceiveResult.actInprogressStatus,context);
 		if (orderInfo != null) {
 			tbl.updateOrderStatus(request.getMobileNo(), request.getBatchID(), request.getActionStatus(),
 					request.getSffOrderNo(), request.getFailReason(), username,context);

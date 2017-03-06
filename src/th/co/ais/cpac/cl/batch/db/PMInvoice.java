@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import th.co.ais.cpac.cl.batch.Constants;
+import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
 import th.co.ais.cpac.cl.batch.db.PMBatchAdjDtl.PMBatchAdjInfoResponse;
 import th.co.ais.cpac.cl.common.Context;
 import th.co.ais.cpac.cl.common.UtilityLogger;
@@ -73,10 +73,10 @@ public class PMInvoice {
 		@Override
 		protected StringBuilder createSqlProcess() {
 			StringBuilder sql = new StringBuilder();
-			sql.append(" SELECT").append(Constants.END_LINE);
-			sql.append(" INVOICE_ID ").append(Constants.END_LINE);
-			sql.append(" PMDB..PM_INVOICE ").append(Constants.END_LINE);
-			sql.append(" WHERE INVOICE_NUM = ('").append(invoiceNum).append("') ").append(Constants.END_LINE);
+			sql.append(" SELECT").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" INVOICE_ID ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" PMDB..PM_INVOICE ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" WHERE INVOICE_NUM = ('").append(invoiceNum).append("') ").append(ConstantsBatchReceiveResult.END_LINE);
 			return sql;
 		}
 
@@ -89,7 +89,7 @@ public class PMInvoice {
 
 		protected PMInvoiceInfoResponse execute(String invoiceNum) {
 			this.invoiceNum = invoiceNum;
-			return executeQuery(Constants.getDBConnectionPools(logger), true);
+			return executeQuery(ConstantsBatchReceiveResult.getDBConnectionPools(logger), true);
 		}
 	}
 

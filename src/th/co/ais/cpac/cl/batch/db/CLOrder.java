@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import th.co.ais.cpac.cl.batch.Constants;
+import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
 import th.co.ais.cpac.cl.common.Context;
 import th.co.ais.cpac.cl.common.UtilityLogger;
 import th.co.ais.cpac.cl.template.database.DBConnectionPools;
@@ -125,14 +125,14 @@ public class CLOrder {
 		@Override
 		protected StringBuilder createSqlProcess() {
 			StringBuilder sql = new StringBuilder();
-			sql.append(" SELECT").append(Constants.END_LINE);
-			sql.append(" a.ORDER_ID,BA_NO,MOBILE_NO,TREATMENT_ID,BATCH_ID ").append(Constants.END_LINE);
-			sql.append(" FROM CL_ORDER_TREATMENT a ").append(Constants.END_LINE);
-			sql.append(" INNER JOIN dbo.CL_ORDER b ").append(Constants.END_LINE);
-			sql.append(" ON a.ORDER_ID=b.ORDER_ID ").append(Constants.END_LINE);
-			sql.append(" WHERE MOBILE_NO = ('").append(mobileNo).append("') ").append(Constants.END_LINE);
-			sql.append(" and ACTION_STATUS = (").append(actStatus).append(")").append(Constants.END_LINE);
-			sql.append(" and BATCH_ID = (").append(batchID).append(")").append(Constants.END_LINE);
+			sql.append(" SELECT").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" a.ORDER_ID,BA_NO,MOBILE_NO,TREATMENT_ID,BATCH_ID ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" FROM CL_ORDER_TREATMENT a ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" INNER JOIN dbo.CL_ORDER b ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" ON a.ORDER_ID=b.ORDER_ID ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" WHERE MOBILE_NO = ('").append(mobileNo).append("') ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" and ACTION_STATUS = (").append(actStatus).append(")").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" and BATCH_ID = (").append(batchID).append(")").append(ConstantsBatchReceiveResult.END_LINE);
 			return sql;
 		}
 
@@ -150,7 +150,7 @@ public class CLOrder {
 			this.mobileNo = mobileNo;
 			this.actStatus=actStatus;
 			this.batchID=batchID;
-			return executeQuery(Constants.getDBConnectionPools(logger), true);
+			return executeQuery(ConstantsBatchReceiveResult.getDBConnectionPools(logger), true);
 		}
 	}
 
@@ -189,18 +189,18 @@ public class CLOrder {
 		@Override
 		protected StringBuilder createSqlProcess() {
 			StringBuilder sql = new StringBuilder();
-			sql.append("UPDATE dbo.CL_ORDER ").append(Constants.END_LINE);
+			sql.append("UPDATE dbo.CL_ORDER ").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append("SET LAST_UPD= getdate() , LAST_UPD_BY='").append(updateBy).append("'")
-					.append(Constants.END_LINE);
-			sql.append(",ACTION_STATUS = ").append(actionStatus).append(Constants.END_LINE);
-			sql.append(", ACTION_STATUS_DTM = getdate() ").append(Constants.END_LINE);
-			sql.append(",SFF_ORDER_NO = '").append(sffOrderNo).append("'").append(Constants.END_LINE);
+					.append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(",ACTION_STATUS = ").append(actionStatus).append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(", ACTION_STATUS_DTM = getdate() ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(",SFF_ORDER_NO = '").append(sffOrderNo).append("'").append(ConstantsBatchReceiveResult.END_LINE);
 			if (failReason != null) {
-				sql.append(", ACTION_REMARK = '").append(failReason).append("'").append(Constants.END_LINE);
+				sql.append(", ACTION_REMARK = '").append(failReason).append("'").append(ConstantsBatchReceiveResult.END_LINE);
 			}
-			sql.append(" WHERE MOBILE_NO  = '").append(mobileNo).append("'").append(Constants.END_LINE);
-			sql.append(" AND BATCH_ID  = ").append(batchID).append(Constants.END_LINE);
-			sql.append(" AND ACTION_STATUS  = ").append(Constants.actInprogressStatus).append(Constants.END_LINE);
+			sql.append(" WHERE MOBILE_NO  = '").append(mobileNo).append("'").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" AND BATCH_ID  = ").append(batchID).append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" AND ACTION_STATUS  = ").append(ConstantsBatchReceiveResult.actInprogressStatus).append(ConstantsBatchReceiveResult.END_LINE);
 			return sql;
 		}
 
@@ -216,7 +216,7 @@ public class CLOrder {
 			this.sffOrderNo = sffOrderNo;
 			this.failReason=failReason;
 			this.updateBy = updateBy;
-			return executeUpdate(Constants.getDBConnectionPools(logger), true); // case
+			return executeUpdate(ConstantsBatchReceiveResult.getDBConnectionPools(logger), true); // case
 																				// adjust
 																				// false;
 		}
@@ -257,12 +257,12 @@ public class CLOrder {
 		@Override
 		protected StringBuilder createSqlProcess() {
 			StringBuilder sql = new StringBuilder();
-			sql.append(" SELECT").append(Constants.END_LINE);
-			sql.append(" TREATMENT_ID,MOBILE_NO,BA_NO,BATCH_ID,ACTION_STATUS ").append(Constants.END_LINE);
-			sql.append(" FROM CL_ORDER_TREATMENT a ").append(Constants.END_LINE);
-			sql.append(" INNER JOIN dbo.CL_ORDER b ").append(Constants.END_LINE);
-			sql.append(" ON a.ORDER_ID=b.ORDER_ID ").append(Constants.END_LINE);
-			sql.append(" WHERE TREATMENT_ID = (").append(treatmentID).append(")").append(Constants.END_LINE);
+			sql.append(" SELECT").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" TREATMENT_ID,MOBILE_NO,BA_NO,BATCH_ID,ACTION_STATUS ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" FROM CL_ORDER_TREATMENT a ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" INNER JOIN dbo.CL_ORDER b ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" ON a.ORDER_ID=b.ORDER_ID ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" WHERE TREATMENT_ID = (").append(treatmentID).append(")").append(ConstantsBatchReceiveResult.END_LINE);
 			return sql;
 		}
 
@@ -279,7 +279,7 @@ public class CLOrder {
 
 		protected CLOrderInfoResponse execute(BigDecimal treatmentID) {
 			this.treatmentID = treatmentID;
-			return executeQuery(Constants.getDBConnectionPools(logger), true);
+			return executeQuery(ConstantsBatchReceiveResult.getDBConnectionPools(logger), true);
 		}
 	}
 	

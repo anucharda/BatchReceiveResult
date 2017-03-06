@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import th.co.ais.cpac.cl.batch.Constants;
+import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
 import th.co.ais.cpac.cl.common.Context;
 import th.co.ais.cpac.cl.common.UtilityLogger;
 import th.co.ais.cpac.cl.template.database.DBConnectionPools;
@@ -81,12 +81,12 @@ public class PMBatchAdjDtl {
 		@Override
 		protected StringBuilder createSqlProcess() {
 			StringBuilder sql = new StringBuilder();
-			sql.append(" SELECT").append(Constants.END_LINE);
-			sql.append(" BATCH_DTL_ID ").append(Constants.END_LINE);
-			sql.append(" PM_BATCH_ADJ_DTL ").append(Constants.END_LINE);
-			sql.append(" WHERE INVOICE_ID = ").append(invoiceID).append(Constants.END_LINE);
-			sql.append(" AND REQ_NON_VAT_AMT + REQ_NET_VAT_AMT + REQ_VAT_AMT = ").append(amount).append(Constants.END_LINE);
-			sql.append(" AND AND ADJ_STATUS  = ").append(adjStatus).append(Constants.END_LINE);
+			sql.append(" SELECT").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" BATCH_DTL_ID ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" PM_BATCH_ADJ_DTL ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" WHERE INVOICE_ID = ").append(invoiceID).append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" AND REQ_NON_VAT_AMT + REQ_NET_VAT_AMT + REQ_VAT_AMT = ").append(amount).append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" AND AND ADJ_STATUS  = ").append(adjStatus).append(ConstantsBatchReceiveResult.END_LINE);
 			return sql;
 		}
 
@@ -101,7 +101,7 @@ public class PMBatchAdjDtl {
 			this.invoiceID = invoiceID;
 			this.amount=amount;
 			this.adjStatus=adjStatus;
-			return executeQuery(Constants.getDBConnectionPools(logger), true);
+			return executeQuery(ConstantsBatchReceiveResult.getDBConnectionPools(logger), true);
 		}
 	}
 

@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import th.co.ais.cpac.cl.batch.Constants;
+import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
 import th.co.ais.cpac.cl.common.Context;
 import th.co.ais.cpac.cl.common.UtilityLogger;
 import th.co.ais.cpac.cl.template.database.DBConnectionPools;
@@ -112,15 +112,15 @@ public class CLWaive {
 		@Override
 		protected StringBuilder createSqlProcess() {
 			StringBuilder sql = new StringBuilder();
-			sql.append(" SELECT").append(Constants.END_LINE);
-			sql.append(" SELECT A.WAIVE_ID, A.BA_NO, A.BATCH_ID, B.TREATMENT_ID ").append(Constants.END_LINE);
-			sql.append(" FROM dbo.CL_WAIVE A a ").append(Constants.END_LINE);
-			sql.append(" INNER JOIN dbo.CL_WAIVE_TREATMEMT b ").append(Constants.END_LINE);
-			sql.append(" ON A.WAIVE_ID = B.WAIVE_ID ").append(Constants.END_LINE);
-			sql.append(" WHERE A.BA_NO  = ('").append(baNo).append("') ").append(Constants.END_LINE);
-			sql.append(" and A.ACTION_STATUS = (").append(actStatus).append(")").append(Constants.END_LINE);
-			sql.append(" and A.BATCH_ID = (").append(batchID).append(")").append(Constants.END_LINE);
-			sql.append(" and A.INVOICE_ID = (").append(invoiceID).append(")").append(Constants.END_LINE);
+			sql.append(" SELECT").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" SELECT A.WAIVE_ID, A.BA_NO, A.BATCH_ID, B.TREATMENT_ID ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" FROM dbo.CL_WAIVE A a ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" INNER JOIN dbo.CL_WAIVE_TREATMEMT b ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" ON A.WAIVE_ID = B.WAIVE_ID ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" WHERE A.BA_NO  = ('").append(baNo).append("') ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" and A.ACTION_STATUS = (").append(actStatus).append(")").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" and A.BATCH_ID = (").append(batchID).append(")").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" and A.INVOICE_ID = (").append(invoiceID).append(")").append(ConstantsBatchReceiveResult.END_LINE);
 			return sql;
 		}
 
@@ -139,7 +139,7 @@ public class CLWaive {
 			this.actStatus = actStatus;
 			this.batchID = batchID;
 			this.invoiceID = invoiceID;
-			return executeQuery(Constants.getDBConnectionPools(logger), true);
+			return executeQuery(ConstantsBatchReceiveResult.getDBConnectionPools(logger), true);
 		}
 	}
 
@@ -183,20 +183,20 @@ public class CLWaive {
 		@Override
 		protected StringBuilder createSqlProcess() {
 			StringBuilder sql = new StringBuilder();
-			sql.append("UPDATE dbo.CL_WAIVE ").append(Constants.END_LINE);
+			sql.append("UPDATE dbo.CL_WAIVE ").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append("SET LAST_UPD= getdate() , LAST_UPD_BY='").append(updateBy).append("'")
-					.append(Constants.END_LINE);
-			sql.append(",ACTION_STATUS = ").append(actionStatus).append(Constants.END_LINE);
-			sql.append(", ACTION_STATUS_DTM = getdate() ").append(Constants.END_LINE);
+					.append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(",ACTION_STATUS = ").append(actionStatus).append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(", ACTION_STATUS_DTM = getdate() ").append(ConstantsBatchReceiveResult.END_LINE);
 			if (failReason != null) {
-				sql.append(", ACTION_REMARK = '").append(failReason).append("'").append(Constants.END_LINE);
+				sql.append(", ACTION_REMARK = '").append(failReason).append("'").append(ConstantsBatchReceiveResult.END_LINE);
 			}
-			sql.append(",PM_BATCH_ADJ_DTL_ID = ").append(batchAdjID).append(Constants.END_LINE);
+			sql.append(",PM_BATCH_ADJ_DTL_ID = ").append(batchAdjID).append(ConstantsBatchReceiveResult.END_LINE);
 
-			sql.append(" WHERE BA_NO   = '").append(baNo).append("'").append(Constants.END_LINE);
-			sql.append(" AND BATCH_ID  = ").append(batchID).append(Constants.END_LINE);
-			sql.append(" AND INVOICE_ID   = ").append(invoiceID).append(Constants.END_LINE);
-			sql.append(" AND ACTION_STATUS  = ").append(Constants.actInprogressStatus).append(Constants.END_LINE);
+			sql.append(" WHERE BA_NO   = '").append(baNo).append("'").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" AND BATCH_ID  = ").append(batchID).append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" AND INVOICE_ID   = ").append(invoiceID).append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" AND ACTION_STATUS  = ").append(ConstantsBatchReceiveResult.actInprogressStatus).append(ConstantsBatchReceiveResult.END_LINE);
 			return sql;
 		}
 
@@ -214,7 +214,7 @@ public class CLWaive {
 			this.batchAdjID = batchAdjID;
 			this.failReason = failReason;
 			this.updateBy = updateBy;
-			return executeUpdate(Constants.getDBConnectionPools(logger), true);
+			return executeUpdate(ConstantsBatchReceiveResult.getDBConnectionPools(logger), true);
 		}
 	}
 
@@ -256,12 +256,12 @@ public class CLWaive {
 		@Override
 		protected StringBuilder createSqlProcess() {
 			StringBuilder sql = new StringBuilder();
-			sql.append(" SELECT").append(Constants.END_LINE);
-			sql.append(" TREATMENT_ID,BA_NO,BATCH_ID,ACTION_STATUS ").append(Constants.END_LINE);
-			sql.append(" FROM CL_WAIVE_TREATMEMT a ").append(Constants.END_LINE);
-			sql.append(" INNER JOIN dbo.CL_WAIVE  b ").append(Constants.END_LINE);
-			sql.append(" ON a.WAIVE_ID =b.WAIVE_ID  ").append(Constants.END_LINE);
-			sql.append(" WHERE TREATMENT_ID = (").append(treatmentID).append(")").append(Constants.END_LINE);
+			sql.append(" SELECT").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" TREATMENT_ID,BA_NO,BATCH_ID,ACTION_STATUS ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" FROM CL_WAIVE_TREATMEMT a ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" INNER JOIN dbo.CL_WAIVE  b ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" ON a.WAIVE_ID =b.WAIVE_ID  ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" WHERE TREATMENT_ID = (").append(treatmentID).append(")").append(ConstantsBatchReceiveResult.END_LINE);
 			return sql;
 		}
 
@@ -277,7 +277,7 @@ public class CLWaive {
 
 		protected CLWaiveInfoResponse execute(BigDecimal treatmentID) {
 			this.treatmentID = treatmentID;
-			return executeQuery(Constants.getDBConnectionPools(logger), true);
+			return executeQuery(ConstantsBatchReceiveResult.getDBConnectionPools(logger), true);
 		}
 	}
 

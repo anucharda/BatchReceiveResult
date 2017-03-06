@@ -3,7 +3,7 @@ package th.co.ais.cpac.cl.batch.db;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import th.co.ais.cpac.cl.batch.Constants;
+import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
 import th.co.ais.cpac.cl.common.Context;
 import th.co.ais.cpac.cl.common.UtilityLogger;
 import th.co.ais.cpac.cl.template.database.DBConnectionPools;
@@ -48,12 +48,12 @@ public class CLBaInfo {
 		@Override
 		protected StringBuilder createSqlProcess() {
 			StringBuilder sql = new StringBuilder();
-			sql.append("UPDATE dbo.CL_BA_INFO B ").append(Constants.END_LINE);
-			sql.append("SET LAST_UPD= getdate() , LAST_UPD_BY='").append(username).append("'").append(Constants.END_LINE);
-			sql.append(",WRITEOFF_BOO  = 'Y'").append(Constants.END_LINE);
-			sql.append(",WRITEOFF_DATE  = ").append(writeOffDtm).append(Constants.END_LINE);
-			sql.append(",WRITEOFF_TYPE  = (SELECT A.WRITEOFF_TYPE_CODE FROM CL_WRITEOFF_TYPE A WHERE A.WRITEOFF_TYPE_ID = ").append(writeOffTypeID).append(")").append(Constants.END_LINE);
-			sql.append(" WHERE BA_NO  = '").append(baNo).append("'").append(Constants.END_LINE);
+			sql.append("UPDATE dbo.CL_BA_INFO B ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append("SET LAST_UPD= getdate() , LAST_UPD_BY='").append(username).append("'").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(",WRITEOFF_BOO  = 'Y'").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(",WRITEOFF_DATE  = ").append(writeOffDtm).append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(",WRITEOFF_TYPE  = (SELECT A.WRITEOFF_TYPE_CODE FROM CL_WRITEOFF_TYPE A WHERE A.WRITEOFF_TYPE_ID = ").append(writeOffTypeID).append(")").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" WHERE BA_NO  = '").append(baNo).append("'").append(ConstantsBatchReceiveResult.END_LINE);
 			return sql;
 		}
 
@@ -63,7 +63,7 @@ public class CLBaInfo {
 			this.writeOffDtm = writeOffDtm;
 			this.username = username;
 			this.writeOffTypeID=writeOffTypeID;
-			return executeUpdate(Constants.getDBConnectionPools(logger), true);
+			return executeUpdate(ConstantsBatchReceiveResult.getDBConnectionPools(logger), true);
 		}
 	}
 

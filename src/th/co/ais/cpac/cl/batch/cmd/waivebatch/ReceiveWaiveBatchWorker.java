@@ -2,7 +2,7 @@ package th.co.ais.cpac.cl.batch.cmd.waivebatch;
 
 import java.io.File;
 
-import th.co.ais.cpac.cl.batch.Constants;
+import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
 import th.co.ais.cpac.cl.batch.util.FileUtil;
 import th.co.ais.cpac.cl.batch.util.PropertiesReader;
 import th.co.ais.cpac.cl.common.Context;
@@ -12,18 +12,18 @@ public class ReceiveWaiveBatchWorker {
 	public static void main(String[] args) {
 		try{
 			Context context = new Context();
-			context.initailLogger("LoggerReceiveSFFWorker", "XXXX|YYYYY");
+			context.initailLogger("LoggerReceiveSFFWorker", "ReceiveWaiveBatchWorker");
 			// TODO Auto-generated method stub
 			context.getLogger().info("----------------------- Start ReceiveWaiveBatchWorker -----------------------");
 			context.getLogger().info("Load configure....");
-			PropertiesReader reader = new PropertiesReader("th.co.ais.cpac.cl.batch", "SystemConfigPath");
+			PropertiesReader reader = new PropertiesReader("th.co.ais.cpac.cl.batch.properties.resource", "SystemConfigPath");
 			// suspendJobType=S,terminateJobType=T,reconnectJobType=R
 			String jobType = args[0];// From Parameter
 			boolean doProcess=true;
 			String inboundSyncPath="" ;
 			String inboundDataPath="" ;
 			String processPath="";
-			if(Constants.waiveBatchJobType.equals(jobType)){
+			if(ConstantsBatchReceiveResult.waiveBatchJobType.equals(jobType)){
 				inboundSyncPath= reader.get("waiveBatch.inboundSyncPath");
 				inboundDataPath =reader.get("waiveBatch.inboundDataPath");
 				processPath = reader.get("waiveBatch.processPath");

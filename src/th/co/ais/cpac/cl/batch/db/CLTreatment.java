@@ -2,7 +2,7 @@ package th.co.ais.cpac.cl.batch.db;
 
 import java.math.BigDecimal;
 
-import th.co.ais.cpac.cl.batch.Constants;
+import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
 import th.co.ais.cpac.cl.batch.db.CLOrder.CLOrderInfoResponse;
 import th.co.ais.cpac.cl.batch.util.ValidateUtil;
 import th.co.ais.cpac.cl.common.Context;
@@ -49,14 +49,14 @@ public class CLTreatment {
 		@Override
 		protected StringBuilder createSqlProcess() {
 			StringBuilder sql = new StringBuilder();
-			sql.append("UPDATE dbo.CL_TREATMENT ").append(Constants.END_LINE);
-			sql.append("SET LAST_UPD= getdate() , LAST_UPD_BY='").append(username).append("'").append(Constants.END_LINE);
-			sql.append(",ACTION_STATUS = ").append(actStatus).append(Constants.END_LINE);
-			sql.append(", ACTION_STATUS_DTM  = getdate() ").append(Constants.END_LINE);
+			sql.append("UPDATE dbo.CL_TREATMENT ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append("SET LAST_UPD= getdate() , LAST_UPD_BY='").append(username).append("'").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(",ACTION_STATUS = ").append(actStatus).append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(", ACTION_STATUS_DTM  = getdate() ").append(ConstantsBatchReceiveResult.END_LINE);
 			if(!ValidateUtil.isNull(failReason)){
-				sql.append(", ACTION_REMARK   ='").append(failReason).append("'").append(Constants.END_LINE);
+				sql.append(", ACTION_REMARK   ='").append(failReason).append("'").append(ConstantsBatchReceiveResult.END_LINE);
 			}
-			sql.append(" WHERE TREATMENT_ID  = ").append(treatmentID).append(Constants.END_LINE);
+			sql.append(" WHERE TREATMENT_ID  = ").append(treatmentID).append(ConstantsBatchReceiveResult.END_LINE);
 			return sql;
 		}
 
@@ -66,7 +66,7 @@ public class CLTreatment {
 			this.treatmentID = treatmentID;
 			this.username = username;
 			this.failReason=failReason;
-			return executeUpdate(Constants.getDBConnectionPools(logger), true);
+			return executeUpdate(ConstantsBatchReceiveResult.getDBConnectionPools(logger), true);
 		}
 	}
 

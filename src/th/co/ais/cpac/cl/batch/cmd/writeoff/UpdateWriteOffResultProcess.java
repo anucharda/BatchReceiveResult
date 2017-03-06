@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.math.BigDecimal;
 
-import th.co.ais.cpac.cl.batch.Constants;
+import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
 import th.co.ais.cpac.cl.batch.bean.UpdateResultWriteOffBean;
 import th.co.ais.cpac.cl.batch.db.CLBaInfo;
 import th.co.ais.cpac.cl.batch.db.CLBatch;
@@ -14,6 +14,7 @@ import th.co.ais.cpac.cl.batch.db.CLWriteOff;
 import th.co.ais.cpac.cl.batch.db.CLWriteOff.CLWriteOffInfoResponse;
 import th.co.ais.cpac.cl.batch.db.CLWriteOff.CLWriteOffTreatementInfo;
 import th.co.ais.cpac.cl.batch.template.ProcessTemplate;
+import th.co.ais.cpac.cl.batch.util.FileUtil;
 import th.co.ais.cpac.cl.batch.util.Utility;
 import th.co.ais.cpac.cl.batch.util.ValidateUtil;
 import th.co.ais.cpac.cl.common.Context;
@@ -22,7 +23,13 @@ public class UpdateWriteOffResultProcess extends ProcessTemplate {
 	@Override
 	protected String getPathDatabase() {
 		// TODO Auto-generated method stub
-		return Constants.cldbConfPath;
+		String dbPath="";
+		try{
+			dbPath=FileUtil.getDBPath();
+		}catch(Exception e){
+			context.getLogger().info("Error->"+e.getMessage()+": "+e.getCause().toString());
+		}
+		return  dbPath;
 	}
 
 	public void executeProcess(Context context, String processPath, String ackFileName, String inboundFileName) { // suspendJobType=S,terminateJobType=T,reconnectJobType=R
@@ -34,7 +41,7 @@ public class UpdateWriteOffResultProcess extends ProcessTemplate {
 
 		try {
 			context.getLogger().info("Start WorkerReceive....");
-			context.getLogger().info("jobType->" + Utility.getJobName(Constants.writeOffJobType));
+			context.getLogger().info("jobType->" + Utility.getJobName(ConstantsBatchReceiveResult.writeOffJobType));
 			context.getLogger().info("AckFileName->" + ackFileName);
 			/***** START LOOP ******/
 			// 1.Rename file.sync to .dat
@@ -42,12 +49,12 @@ public class UpdateWriteOffResultProcess extends ProcessTemplate {
 			// 2. Find Batch ID by fileDatExtName
 			if (inboundFileName.indexOf("_WO_") != -1) {
 				CLBatch batchDB = new CLBatch(context.getLogger());
-				CLBatchInfo result = batchDB.getBatchInfoByFileName(Constants.batchInprogressStatus, inboundFileName,context);
-				String username = Utility.getusername(Constants.writeOffJobType);
+				CLBatchInfo result = batchDB.getBatchInfoByFileName(ConstantsBatchReceiveResult.batchInprogressStatus, inboundFileName,context);
+				String username = Utility.getusername(ConstantsBatchReceiveResult.writeOffJobType);
 				if (result != null) {
 					// 2.1 Update File Batch
 					batchID = result.getBatchId();
-					batchDB.updateInboundReceiveStatus(Constants.batchReceiveStatus, batchID, ackFileName, username,context);
+					batchDB.updateInboundReceiveStatus(ConstantsBatchReceiveResult.batchReceiveStatus, batchID, ackFileName, username,context);
 					// 2.2 Read File
 					String filePath = processPath + "/" + inboundFileName;
 					BufferedReader br = null;
@@ -57,20 +64,20 @@ public class UpdateWriteOffResultProcess extends ProcessTemplate {
 						while ((sCurrentLine = br.readLine()) != null) {
 							String dataContent = sCurrentLine;
 							if (!ValidateUtil.isNull(dataContent)) {
-								String[] dataContentArr = dataContent.split(Constants.PIPE);
+								String[] dataContentArr = dataContent.split(ConstantsBatchReceiveResult.PIPE);
 								if (dataContentArr != null && dataContentArr.length > 0) {
 									if (dataContentArr.length == 14) {
 										boolean successFlag = false;
-										if (Constants.writeOffSuccess.equals(dataContentArr[0])
-												|| Constants.writeOffFail.equals(dataContentArr[0])) {
-											if (Constants.writeOffSuccess.equals(dataContentArr[0])) {
+										if (ConstantsBatchReceiveResult.writeOffSuccess.equals(dataContentArr[0])
+												|| ConstantsBatchReceiveResult.writeOffFail.equals(dataContentArr[0])) {
+											if (ConstantsBatchReceiveResult.writeOffSuccess.equals(dataContentArr[0])) {
 												successFlag = true;
 											}
 											UpdateResultWriteOffBean request = new UpdateResultWriteOffBean();
 											if (successFlag) {
-												request.setActionStatus(Constants.actSuccessStatus);
+												request.setActionStatus(ConstantsBatchReceiveResult.actSuccessStatus);
 											} else {
-												request.setActionStatus(Constants.actFailStatus);
+												request.setActionStatus(ConstantsBatchReceiveResult.actFailStatus);
 											}
 											request.setType(dataContentArr[0]);
 											request.setFileName(ackFileName);
@@ -133,7 +140,7 @@ public class UpdateWriteOffResultProcess extends ProcessTemplate {
 				// 1.Update CL_TREATEMENT
 				treatmentDB.updateTreatmentReceive(request.getActionStatus(), writeOffInfo.getTreatementId(), username,
 						failMsg.toString(),context);
-				if (Constants.writeOffSuccess.equals(request.getType())) {
+				if (ConstantsBatchReceiveResult.writeOffSuccess.equals(request.getType())) {
 					CLBaInfo baInfoDB = new CLBaInfo(context.getLogger());
 					baInfoDB.updateTreatmentReceive(writeOffInfo.getBaNo(), writeOffInfo.getWriteOffDtm(),
 							writeOffInfo.getWriteOffTypeId(), username,context);

@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 
-import th.co.ais.cpac.cl.batch.Constants;
+import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
 import th.co.ais.cpac.cl.common.Context;
 import th.co.ais.cpac.cl.common.UtilityLogger;
 import th.co.ais.cpac.cl.template.database.DBConnectionPools;
@@ -101,12 +101,12 @@ public class CLWriteOff {
 		@Override
 		protected StringBuilder createSqlProcess() {
 			StringBuilder sql = new StringBuilder();
-			sql.append(" SELECT").append(Constants.END_LINE);
-			sql.append(" WT.TREATMENT_ID, W.BA_NO, W.WRITEOFF_DATE, W.WRITEOFF_TYPE_ID ").append(Constants.END_LINE);
-			sql.append(" FROM dbo.CL_WRITEOFF W ").append(Constants.END_LINE);
-			sql.append(" INNER JOIN dbo.CL_WRITEOFF_TREATMENT WT ").append(Constants.END_LINE);
-			sql.append(" ON W.WRITEOFF_ID = WT.WRITEOFF_ID ").append(Constants.END_LINE);
-			sql.append(" WHERE W.BATCH_ID  = (").append(batchID).append(")").append(Constants.END_LINE);
+			sql.append(" SELECT").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" WT.TREATMENT_ID, W.BA_NO, W.WRITEOFF_DATE, W.WRITEOFF_TYPE_ID ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" FROM dbo.CL_WRITEOFF W ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" INNER JOIN dbo.CL_WRITEOFF_TREATMENT WT ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" ON W.WRITEOFF_ID = WT.WRITEOFF_ID ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" WHERE W.BATCH_ID  = (").append(batchID).append(")").append(ConstantsBatchReceiveResult.END_LINE);
 			return sql;
 		}
 
@@ -122,7 +122,7 @@ public class CLWriteOff {
 
 		protected CLWriteOffInfoResponse execute(BigDecimal batchID) {
 			this.batchID = batchID;
-			return executeQuery(Constants.getDBConnectionPools(logger), true);
+			return executeQuery(ConstantsBatchReceiveResult.getDBConnectionPools(logger), true);
 		}
 	}
 
