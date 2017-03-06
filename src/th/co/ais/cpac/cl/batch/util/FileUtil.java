@@ -15,7 +15,9 @@ public class FileUtil {
 			throws Exception {
 		File dir = new File(filePath);
 		File[] files = dir.listFiles((d, name) -> name.endsWith("." + extension));
-		Arrays.sort(files, LastModifiedFileComparator.LASTMODIFIED_COMPARATOR);
+		if(files!=null && files.length>0){
+			Arrays.sort(files, LastModifiedFileComparator.LASTMODIFIED_COMPARATOR);
+		}
 		return files;
 	}
 

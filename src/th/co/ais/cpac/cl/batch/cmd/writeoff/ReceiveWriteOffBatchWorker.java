@@ -33,8 +33,9 @@ public class ReceiveWriteOffBatchWorker {
 				}
 				if(doProcess){
 					File[] files = FileUtil.getAllFilesThatMatchFilenameExtensionAscendingOrder(inboundAckPath, "sync");
-					context.getLogger().info("Ack file size --> "+files.length);
+
 					if(files!=null && files.length>0){
+						context.getLogger().info("Ack file size --> "+files.length);
 						//Loop for do all sync file.
 						for(int i=0; i<files.length; i++){
 							String doPath = processPath;

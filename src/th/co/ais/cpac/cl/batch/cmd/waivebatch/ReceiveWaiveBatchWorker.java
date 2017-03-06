@@ -34,8 +34,9 @@ public class ReceiveWaiveBatchWorker {
 			
 			if(doProcess){
 				File[] files = FileUtil.getAllFilesThatMatchFilenameExtensionAscendingOrder(inboundSyncPath, "sync");
-				context.getLogger().info("Sync file size --> "+files.length);
+
 				if(files!=null && files.length>0){
+					context.getLogger().info("Sync file size --> "+files.length);
 					//Loop for do all sync file.
 					for(int i=0; i<files.length; i++){
 						String doPath = processPath;
