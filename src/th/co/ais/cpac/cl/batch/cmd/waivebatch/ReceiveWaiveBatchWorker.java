@@ -86,7 +86,7 @@ public class ReceiveWaiveBatchWorker {
 		// Check จากชื่อไฟล์ว่าเป็น batch suspense/reconnect/terminate
 
 		context.getLogger().info("Trigger UpdateWaiveBatchResultProcess....");
-		new UpdateWaiveBatchResultProcess().executeProcess(context, processPath,syncFileName,inboundFileName); /// ?????????????????
+		new UpdateWaiveBatchResultProcess().executeProcess(context, processPath,syncFileName,inboundFileName); 
 		context.getLogger().info("End UpdateWaiveBatchResultProcess Execute....");
 	}
 

@@ -83,7 +83,7 @@ public class PMBatchAdjDtl {
 			StringBuilder sql = new StringBuilder();
 			sql.append(" SELECT").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(" BATCH_DTL_ID ").append(ConstantsBatchReceiveResult.END_LINE);
-			sql.append(" PM_BATCH_ADJ_DTL ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" PMDB..PM_BATCH_ADJ_DTL ").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(" WHERE INVOICE_ID = ").append(invoiceID).append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(" AND REQ_NON_VAT_AMT + REQ_NET_VAT_AMT + REQ_VAT_AMT = ").append(amount).append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(" AND AND ADJ_STATUS  = ").append(adjStatus).append(ConstantsBatchReceiveResult.END_LINE);

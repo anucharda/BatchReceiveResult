@@ -115,7 +115,7 @@ public class ReceiveSFFWorker {
 	public static void execute(Context context,String jobType,String[] fileNames,String processPath){
 		 context.getLogger().info("Start UpdateSFFResultProcess Execute....");
 		 context.getLogger().info("Trigger Update SSF Result Process....");
-		 new UpdateSFFResultProcess().executeProcess(context,jobType,fileNames,processPath); ///?????????????????
+		 new UpdateSFFResultProcess().executeProcess(context,jobType,fileNames,processPath); 
 		 context.getLogger().info("End UpdateSFFResultProcess Execute....");
 	}
 	

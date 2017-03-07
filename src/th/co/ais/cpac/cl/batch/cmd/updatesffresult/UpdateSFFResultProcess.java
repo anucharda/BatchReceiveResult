@@ -50,7 +50,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 			context.getLogger().info("jobType->" +  Utility.getJobName(jobType));
 			context.getLogger().info("fileNames->" + fileNames.toString());
 
-			if (new ConstantsBatchReceiveResult().suspendJobType.equals(jobType) || ConstantsBatchReceiveResult.terminateJobType.equals(jobType)
+			if (ConstantsBatchReceiveResult.suspendJobType.equals(jobType) || ConstantsBatchReceiveResult.terminateJobType.equals(jobType)
 					|| ConstantsBatchReceiveResult.reconnectJobType.equals(jobType)) {
 
 				/***** START LOOP ******/
@@ -118,7 +118,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 															batchID, batchFileName, username,context);
 														firstFile = true;
 													} else {
-														throw new Exception("Not Find Batch ID : " + filePath);
+														throw new Exception("Not Find Batch ID : " + fileName);
 													}
 												}
 											} else {

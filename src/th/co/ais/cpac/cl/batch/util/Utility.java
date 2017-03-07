@@ -4,7 +4,7 @@ import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
 
 public class Utility {
 	public static String getusername(String jobType) {
-		if (new ConstantsBatchReceiveResult().suspendJobType.equals(jobType)) {
+		if (ConstantsBatchReceiveResult.suspendJobType.equals(jobType)) {
 			return ConstantsBatchReceiveResult.suspendUsername;
 		} else if (ConstantsBatchReceiveResult.terminateJobType.equals(jobType)) {
 			return ConstantsBatchReceiveResult.terminateUsername;
@@ -14,12 +14,15 @@ public class Utility {
 			return ConstantsBatchReceiveResult.waiveBatchUsername;
 		}else if (ConstantsBatchReceiveResult.writeOffJobType.equals(jobType)) {
 			return ConstantsBatchReceiveResult.writeOffUsername;
-		}else{
+		}else if (ConstantsBatchReceiveResult.blacklistJobType.equals(jobType)) {
+			return ConstantsBatchReceiveResult.blacklistUsername;
+		}
+		else{
 			return "undefined";
 		}
 	}
 	public static int getActionID(String jobType) {
-		if (new ConstantsBatchReceiveResult().suspendJobType.equals(jobType)) {
+		if (ConstantsBatchReceiveResult.suspendJobType.equals(jobType)) {
 			return ConstantsBatchReceiveResult.suspendOrderActionID;
 		} else if (ConstantsBatchReceiveResult.terminateJobType.equals(jobType)) {
 			return ConstantsBatchReceiveResult.terminateOrderActionID;

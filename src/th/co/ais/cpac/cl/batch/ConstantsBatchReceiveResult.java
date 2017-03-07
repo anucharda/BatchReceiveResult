@@ -27,6 +27,7 @@ public class ConstantsBatchReceiveResult {
 	public static String reconnectJobType="RC";
 	public static String waiveBatchJobType="WA";
 	public static String writeOffJobType ="WO";
+	public static String blacklistJobType="BL";
 	public static int batchInprogressStatus = 1;
 	public static int batchReceiveStatus = 2;
 	public static int batchCompleteStatus = 3;
@@ -36,7 +37,7 @@ public class ConstantsBatchReceiveResult {
 	public static String reconnectUsername = "Reconnect User";
 	public static String waiveBatchUsername = "Waive Batch User";
 	public static String writeOffUsername = "Write Off Batch User";
-	
+	public static String blacklistUsername = "Blacklist Batch User";
 	public static int actInprogressStatus = 3;
 	public static int actSuccessStatus = 4;
 	public static int actIncompleteStatus = 5;
@@ -50,8 +51,10 @@ public class ConstantsBatchReceiveResult {
 	public static String PIPE ="\\|";
 	public static String sffOKExt =".ok";
 	public static String sffErrExt =".err";
+	public static String blacklistExt =".dat";
 	public static String writeOffSuccess ="S";
 	public static String writeOffFail ="E";
+	public static String blacklistFailReason="Not Found Result in SFF_BLACKLIST";
 
 	public static DBConnectionPools getDBConnectionPools(UtilityLogger logger) {
 		CNFDatabase cnf = new CNFDatabase();
