@@ -123,9 +123,9 @@ public class CLBlacklist {
 			sql.append(" AND BATCH_ID = (").append(batchID).append(")").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(" AND S.BILLING_ACCNT_ID = (SELECT B.SFF_ACCOUNT_ID FROM CL_BA_INFO B WHERE B.BA_NO = '")
 					.append(baNo).append("') ").append(ConstantsBatchReceiveResult.END_LINE);
-			sql.append(" AND C.BA_NO = '").append(baNo).append("') ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" AND C.BA_NO = '").append(baNo).append("' ").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(
-					" AND C.convert(Varchar(10),C.BLACKLIST_REQUEST_DATE,112)+ str_replace(convert(Varchar(15),BLACKLIST_REQUEST_DATE,108),':',null) = '")
+					" AND convert(Varchar(10),C.BLACKLIST_REQUEST_DATE,112)+ str_replace(convert(Varchar(15),BLACKLIST_REQUEST_DATE,108),':',null) = '")
 					.append(blacklistDtm).append("' ").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(" AND C.BLACKLIST_TYPE = '").append(blacklistType).append("' ")
 					.append(ConstantsBatchReceiveResult.END_LINE);
@@ -218,9 +218,9 @@ public class CLBlacklist {
 			sql.append(" AND BATCH_ID = (").append(batchID).append(")").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(" AND S.BILLING_ACCNT_ID = (SELECT B.SFF_ACCOUNT_ID FROM CL_BA_INFO B WHERE B.BA_NO = '")
 					.append(baNo).append("') ").append(ConstantsBatchReceiveResult.END_LINE);
-			sql.append(" AND C.BA_NO = '").append(baNo).append("') ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" AND C.BA_NO = '").append(baNo).append("' ").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(
-					" AND C.convert(Varchar(10),C.BLACKLIST_REQUEST_DATE,112)+ str_replace(convert(Varchar(15),BLACKLIST_REQUEST_DATE,108),':',null) = '")
+					" AND convert(Varchar(10),C.BLACKLIST_REQUEST_DATE,112)+ str_replace(convert(Varchar(15),BLACKLIST_REQUEST_DATE,108),':',null) = '")
 					.append(blacklistEndDtm).append("' ").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(" AND C.BLACKLIST_TYPE = '").append(blacklistType).append("' ")
 					.append(ConstantsBatchReceiveResult.END_LINE);
@@ -347,14 +347,14 @@ public class CLBlacklist {
 		@Override
 		protected StringBuilder createSqlProcess() {
 			StringBuilder sql = new StringBuilder();
-			sql.append("UPDATE dbo.CL_BLACKLIST T ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append("UPDATE dbo.CL_BLACKLIST ").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append("SET LAST_UPD= getdate() , LAST_UPD_BY='").append(updateBy).append("'")
 					.append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(",ACTION_STATUS = ").append(resultStatus).append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(", ACTION_STATUS_DTM = getdate() ").append(ConstantsBatchReceiveResult.END_LINE);		
 			sql.append(",ACTION_REMARK = '").append(actRemark).append("'").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(" WHERE ACTION_STATUS   = ").append(actionStatus).append(ConstantsBatchReceiveResult.END_LINE);
-			sql.append(" AND EXISTS (SELECT * FROM CL_BLACKLIST C, CL_BLACKLIST_TREATMENT BT WHERE C.BLACKLIST_ID = BT.BLACKLIST_ID	AND BT.TREATMENT_ID = T.TREATMENT_ID AND C.BATCH_ID= ").append(batchID).append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" AND BATCH_ID= ").append(batchID).append(ConstantsBatchReceiveResult.END_LINE);
 			return sql;
 		}
 

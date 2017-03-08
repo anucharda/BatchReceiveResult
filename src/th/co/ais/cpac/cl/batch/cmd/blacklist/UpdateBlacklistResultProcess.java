@@ -57,7 +57,7 @@ public class UpdateBlacklistResultProcess extends ProcessTemplate {
 				
 				/***Find BatchID****/
 				CLBatch batchDB = new CLBatch(context.getLogger());
-				CLBatchInfo result = batchDB.getBatchInfoByFileName(ConstantsBatchReceiveResult.batchInprogressStatus, fileName,context);
+				CLBatchInfo result = batchDB.getBatchInfoByFileName(ConstantsBatchReceiveResult.batchInprogressStatus, originalFile,context);
 
 				if (result != null) {
 				// 3.2 Update Batch Status to
