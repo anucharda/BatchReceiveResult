@@ -111,7 +111,8 @@ public class CLTreatment {
 			sql.append(", ACTION_STATUS_DTM  = getdate() ").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(" FROM CL_TREATMENT T ").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append("JOIN CL_BLACKLIST_TREATMENT BT  on T.TREATMENT_ID=BT.TREATMENT_ID AND BT.BLACKLIST_ID = (").append(blacklistID).append(") ").append(ConstantsBatchReceiveResult.END_LINE);
-			sql.append("JOIN CL_BLACKLIST B on B.BLACKLIST_ID = BT.BLACKLIST_ID  and B.BLACKLIST_ACTION_ID = T.ACTION_ID ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append("JOIN CL_BLACKLIST B on B.BLACKLIST_ID = BT.BLACKLIST_ID ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append("JOIN CL_ACTION A ON T.ACTION_ID = A.ACTION_ID AND A.ACTION_MODE IN (10,11) ").append(ConstantsBatchReceiveResult.END_LINE);
 
 			return sql;
 		}
@@ -169,7 +170,8 @@ public class CLTreatment {
 			sql.append(", ACTION_REMARK   ='").append(actRemark).append("'").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(" FROM dbo.CL_TREATMENT  T ").append(ConstantsBatchReceiveResult.END_LINE);			
 			sql.append(" JOIN CL_BLACKLIST_TREATMENT BT on T.TREATMENT_ID=BT.TREATMENT_ID ").append(ConstantsBatchReceiveResult.END_LINE);
-			sql.append(" JOIN CL_BLACKLIST  B  on BT.BLACKLIST_ID=B.BLACKLIST_ID and B.BLACKLIST_ACTION_ID = T.ACTION_ID ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" JOIN CL_BLACKLIST  B  on BT.BLACKLIST_ID=B.BLACKLIST_ID ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" JOIN CL_ACTION A ON T.ACTION_ID = A.ACTION_ID AND A.ACTION_MODE IN (10,11) ").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(" WHERE T.ACTION_STATUS   = ").append(actStatus).append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(" AND B.BATCH_ID= ").append(batchID).append(ConstantsBatchReceiveResult.END_LINE);
 			return sql;
