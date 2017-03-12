@@ -31,6 +31,66 @@ public class CLTreatment {
 		}
 	}
 	
+	protected class UpdateWriteOffFailAction extends DBTemplatesUpdate<ExecuteResponse, UtilityLogger, DBConnectionPools> {
+		private BigDecimal batchID;
+		private String username;
+		private String failReason;
+		private int actStatus;
+		public UpdateWriteOffFailAction(UtilityLogger logger) {
+			super(logger);
+		}
+
+		@Override
+		protected ExecuteResponse createResponse() {
+			return new ExecuteResponse();
+		}
+
+		@Override
+		protected StringBuilder createSqlProcess() {
+			StringBuilder sql = new StringBuilder();
+			sql.append("UPDATE dbo.CL_TREATMENT ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append("SET LAST_UPD= getdate() , LAST_UPD_BY='").append(username).append("'").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(",ACTION_STATUS = ").append(actStatus).append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(", ACTION_STATUS_DTM  = getdate() ").append(ConstantsBatchReceiveResult.END_LINE);
+			if(!ValidateUtil.isNull(failReason)){
+				sql.append(", ACTION_REMARK   ='").append(failReason).append("'").append(ConstantsBatchReceiveResult.END_LINE);
+			}
+			sql.append("FROM CL_TREATMENT T ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append("JOIN CL_WRITEOFF_TREATMENT WT ON T.TREATMENT_ID = WT.TREATMENT_ID ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append("JOIN CL_WRITEOFF W ON WT.WRITEOFF_ID = W.WRITEOFF_ID ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append("WHERE T.ACTION_STATUS = 3 ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append("AND W.BATCH_ID = ").append(batchID).append(ConstantsBatchReceiveResult.END_LINE);
+			return sql;
+		}
+
+
+		protected ExecuteResponse execute(int actStatus,  BigDecimal batchID,String username,String failReason) {
+			this.actStatus = actStatus;
+			this.batchID = batchID;
+			this.username = username;
+			this.failReason=failReason;
+			return executeUpdate(ConstantsBatchReceiveResult.getDBConnectionPools(logger), true);
+		}
+	}
+
+	public ExecuteResponse updateWriteOffFail(int actStatus,  BigDecimal batchID,String username,String failReason,Context context) throws Exception {
+		ExecuteResponse response= new UpdateWriteOffFailAction(logger).execute(actStatus, batchID,username,failReason);
+		context.getLogger().debug("updateWriteOffFail->"+response.info().toString());
+
+		switch(response.getStatusCode()){
+			case CLOrderInfoResponse.STATUS_COMPLETE:{
+				break;
+			}
+			case CLOrderInfoResponse.STATUS_DATA_NOT_FOUND:{
+				break;
+			}
+			default:{
+				throw new Exception("Error : " + response.getErrorMsg());
+			}
+		}
+		
+		return response;
+	}
 	protected class UpdateTreatmentReceiveAction extends DBTemplatesUpdate<ExecuteResponse, UtilityLogger, DBConnectionPools> {
 		private int actStatus;
 		private BigDecimal treatmentID;
@@ -56,7 +116,9 @@ public class CLTreatment {
 			if(!ValidateUtil.isNull(failReason)){
 				sql.append(", ACTION_REMARK   ='").append(failReason).append("'").append(ConstantsBatchReceiveResult.END_LINE);
 			}
-			sql.append(" WHERE TREATMENT_ID  = ").append(treatmentID).append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" WHERE ACTION_STATUS = 3 ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" AND TREATMENT_ID  = ").append(treatmentID).append(ConstantsBatchReceiveResult.END_LINE);
+
 			return sql;
 		}
 

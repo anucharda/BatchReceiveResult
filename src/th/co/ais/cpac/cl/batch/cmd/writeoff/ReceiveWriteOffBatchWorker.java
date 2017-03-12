@@ -10,8 +10,8 @@ import th.co.ais.cpac.cl.common.Context;
 public class ReceiveWriteOffBatchWorker {
 
 	public static void main(String[] args) {
+		Context context = new Context();
 		try{
-			 Context context = new Context();
 				context.initailLogger("LoggerReceiveSFFWorker", "ReceiveWriteOffBatchWorker");
 				// TODO Auto-generated method stub
 				context.getLogger().info("----------------------- Start ReceiveWriteOffBatchWorker -----------------------");
@@ -78,6 +78,7 @@ public class ReceiveWriteOffBatchWorker {
 				
 		}catch(Exception e){
 			e.printStackTrace();
+			context.getLogger().error(  "Error->"+e.getMessage()+": "+e.getCause().toString() ,e);
 		}
 	}
 	

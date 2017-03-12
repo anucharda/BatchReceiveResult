@@ -10,8 +10,8 @@ import th.co.ais.cpac.cl.common.Context;
 public class ReceiveWaiveBatchWorker {
 
 	public static void main(String[] args) {
+		Context context = new Context();
 		try{
-			Context context = new Context();
 			context.initailLogger("LoggerReceiveSFFWorker", "ReceiveWaiveBatchWorker");
 			// TODO Auto-generated method stub
 			context.getLogger().info("----------------------- Start ReceiveWaiveBatchWorker -----------------------");
@@ -78,6 +78,7 @@ public class ReceiveWaiveBatchWorker {
 			context.getLogger().info("End ReceiveWaiveBatchWorker....");
 		}catch(Exception e){
 			e.printStackTrace();
+			context.getLogger().error(  "Error->"+e.getMessage()+": "+e.getCause().toString() ,e);
 		}
 	}
 

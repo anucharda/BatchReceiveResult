@@ -238,12 +238,14 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 		// inprocess
 		orderInfo = tbl.getOrderTreatementInfo(request.getMobileNo(), request.getBatchID(),
 				ConstantsBatchReceiveResult.actInprogressStatus,context);
-		if (orderInfo != null) {
-			tbl.updateOrderStatus(request.getMobileNo(), request.getBatchID(), request.getActionStatus(),
-					request.getSffOrderNo(), request.getFailReason(), username,context);
-		} else {
-			context.getLogger().info("no orderInfo -> " + request.toString());
+		
+		if(orderInfo==null){
+			context.getLogger().info("no orderInfo in treatment -> " + request.toString());
 		}
+
+		tbl.updateOrderStatus(request.getMobileNo(), request.getBatchID(), request.getActionStatus(),
+					request.getSffOrderNo(), request.getFailReason(), username,context);
+		
 		return orderInfo;
 	}
 

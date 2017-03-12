@@ -108,7 +108,8 @@ public class ReceiveSFFWorker {
 			
 			context.getLogger().info("----------------------- End ReceiveSFFWorker ----------------------- ");
 		}catch(Exception e){
-			context.getLogger().info("Error->"+e.getMessage()+": "+e.getCause().toString());
+			e.printStackTrace();
+			context.getLogger().error(  "Error->"+e.getMessage()+": "+e.getCause().toString() ,e);
 		}
 	}
 	

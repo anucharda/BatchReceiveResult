@@ -13,6 +13,9 @@ public class FileUtil {
 	@SuppressWarnings("unchecked")
 	public static File[] getAllFilesThatMatchFilenameExtensionAscendingOrder(String filePath, String extension)
 			throws Exception {
+		if(filePath==null||"".equals(filePath)){
+			throw new Exception("File Path is null");
+		}
 		File dir = new File(filePath);
 		File[] files = dir.listFiles((d, name) -> name.endsWith("." + extension));
 		if(files!=null && files.length>0){
@@ -22,6 +25,9 @@ public class FileUtil {
 	}
 
 	public static File[] getAllFileThatMatchFilenameExtension(String filePath, String extension) throws Exception {
+		if(filePath==null||"".equals(filePath)){
+			throw new Exception("File Path is null");
+		}
 		File dir = new File(filePath);
 		File[] files = dir.listFiles((d, name) -> name.endsWith("." + extension));
 		return files;

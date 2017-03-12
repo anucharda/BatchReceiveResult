@@ -76,7 +76,8 @@ public class PMInvoice {
 			sql.append(" SELECT").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(" INVOICE_ID ").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(" PMDB..PM_INVOICE ").append(ConstantsBatchReceiveResult.END_LINE);
-			sql.append(" WHERE INVOICE_NUM = ('").append(invoiceNum).append("') ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" WHERE INVOICE_NUM = ('").append(invoiceNum).append("') ")
+					.append(ConstantsBatchReceiveResult.END_LINE);
 			return sql;
 		}
 
@@ -93,22 +94,84 @@ public class PMInvoice {
 		}
 	}
 
-	public PMInvoiceInfoResponse getInvoiceIDByInvoiceNum(String invoiceNum,Context context) throws Exception {
+	public PMInvoiceInfoResponse getInvoiceIDByInvoiceNum(String invoiceNum, Context context) throws Exception {
 		PMInvoiceInfoResponse response = new FindPMInvoiceIDAction(logger).execute(invoiceNum);
-		context.getLogger().debug("getInvoiceIDByInvoiceNum->"+response.info().toString());
+		context.getLogger().debug("getInvoiceIDByInvoiceNum->" + response.info().toString());
 
-		switch(response.getStatusCode()){
-			case PMInvoiceInfoResponse.STATUS_COMPLETE:{
-				break;
-			}
-			case PMInvoiceInfoResponse.STATUS_DATA_NOT_FOUND:{
-				break;
-			}
-			default:{
-				throw new Exception("Error : " + response.getErrorMsg());
-			}
+		switch (response.getStatusCode()) {
+		case PMInvoiceInfoResponse.STATUS_COMPLETE: {
+			break;
 		}
-		
+		case PMInvoiceInfoResponse.STATUS_DATA_NOT_FOUND: {
+			break;
+		}
+		default: {
+			throw new Exception("Error : " + response.getErrorMsg());
+		}
+		}
+
+		return response;
+	}
+
+	public class PMInvoiceNumResponse extends DBTemplatesResponse<ArrayList<String>> {
+
+		@Override
+		protected ArrayList<String> createResponse() {
+			return new ArrayList<>();
+		}
+	}
+
+	protected class FindInvoiceNumAction
+			extends DBTemplatesExecuteQuery<PMInvoiceNumResponse, UtilityLogger, DBConnectionPools> {
+		private String baNo;
+
+		public FindInvoiceNumAction(UtilityLogger logger) {
+			super(logger);
+		}
+
+		@Override
+		protected PMInvoiceNumResponse createResponse() {
+			return new PMInvoiceNumResponse();
+		}
+
+		@Override
+		protected StringBuilder createSqlProcess() {
+			StringBuilder sql = new StringBuilder();
+			sql.append(" SELECT").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" INVOICE_NUM ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" PMDB..PM_INVOICE ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" WHERE BA_NO = ('").append(baNo).append("') ") .append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" AND INVOICE_TOTAL_BAL > 0 ").append(ConstantsBatchReceiveResult.END_LINE);
+			return sql;
+		}
+
+		@Override
+		protected void setReturnValue(ResultSet resultSet) throws SQLException {
+			response.getResponse().add(resultSet.getString("INVOICE_NUM"));
+		}
+
+		protected PMInvoiceNumResponse execute(String baNo) {
+			this.baNo = baNo;
+			return executeQuery(ConstantsBatchReceiveResult.getDBConnectionPools(logger), true);
+		}
+	}
+
+	public PMInvoiceNumResponse getInvoiceNumbByBaNo(String baNo, Context context) throws Exception {
+		PMInvoiceNumResponse response = new FindInvoiceNumAction(logger).execute(baNo);
+		context.getLogger().debug("getInvoiceIDByInvoiceNum->" + response.info().toString());
+
+		switch (response.getStatusCode()) {
+		case PMInvoiceInfoResponse.STATUS_COMPLETE: {
+			break;
+		}
+		case PMInvoiceInfoResponse.STATUS_DATA_NOT_FOUND: {
+			break;
+		}
+		default: {
+			throw new Exception("Error : " + response.getErrorMsg());
+		}
+		}
+
 		return response;
 	}
 

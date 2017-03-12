@@ -1,18 +1,14 @@
 package th.co.ais.cpac.cl.batch.cmd.waivebatch;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.math.BigDecimal;
 import java.util.HashMap;
 
 import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
-import th.co.ais.cpac.cl.batch.bean.UpdateResultSSFBean;
 import th.co.ais.cpac.cl.batch.bean.UpdateResultWaiveBatchBean;
-import th.co.ais.cpac.cl.batch.cnf.CNFDatabase;
 import th.co.ais.cpac.cl.batch.db.CLBatch;
 import th.co.ais.cpac.cl.batch.db.CLBatch.CLBatchInfo;
-import th.co.ais.cpac.cl.batch.db.CLOrder.CLOrderTreatementInfo;
 import th.co.ais.cpac.cl.batch.db.CLTreatment;
 import th.co.ais.cpac.cl.batch.db.CLWaive;
 import th.co.ais.cpac.cl.batch.db.CLWaive.CLWaiveInfoResponse;
@@ -26,8 +22,6 @@ import th.co.ais.cpac.cl.batch.util.FileUtil;
 import th.co.ais.cpac.cl.batch.util.Utility;
 import th.co.ais.cpac.cl.batch.util.ValidateUtil;
 import th.co.ais.cpac.cl.common.Context;
-import th.co.ais.cpac.cl.common.UtilityLogger;
-import th.co.ais.cpac.cl.template.database.DBConnectionPools;
 
 public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 	@Override
@@ -236,12 +230,11 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 
 		waiveInfo = tbl.getWaiveTreatementInfo(request.getBaNo(), request.getBatchID(), request.getInvoiceID(),
 				ConstantsBatchReceiveResult.actInprogressStatus,context);
-		if (waiveInfo != null) {
-			tbl.updateWaiveStatus(request.getBaNo(), request.getBatchID(), request.getInvoiceID(),
-					request.getBatchAdjDtlID(), request.getActionStatus(), request.getFailReason(), username,context);
-		} else {
+		if(waiveInfo==null){
 			context.getLogger().info("no orderInfo -> " + request.toString());
 		}
+		tbl.updateWaiveStatus(request.getBaNo(), request.getBatchID(), request.getInvoiceID(),
+				request.getBatchAdjDtlID(), request.getActionStatus(), request.getFailReason(), username,context);
 		return waiveInfo;
 	}
 

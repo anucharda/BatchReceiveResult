@@ -39,7 +39,6 @@ public class CLWriteOff {
 
 		private BigDecimal treatementId;
 		private String baNo;
-		private Date writeOffDtm;
 		private BigDecimal writeOffTypeId;
 
 		public BigDecimal getTreatementId() {
@@ -56,14 +55,6 @@ public class CLWriteOff {
 
 		public void setBaNo(String baNo) {
 			this.baNo = baNo;
-		}
-
-		public Date getWriteOffDtm() {
-			return writeOffDtm;
-		}
-
-		public void setWriteOffDtm(Date writeOffDtm) {
-			this.writeOffDtm = writeOffDtm;
 		}
 
 		public BigDecimal getWriteOffTypeId() {
@@ -102,7 +93,7 @@ public class CLWriteOff {
 		protected StringBuilder createSqlProcess() {
 			StringBuilder sql = new StringBuilder();
 			sql.append(" SELECT").append(ConstantsBatchReceiveResult.END_LINE);
-			sql.append(" WT.TREATMENT_ID, W.BA_NO, W.WRITEOFF_DATE, W.WRITEOFF_TYPE_ID ").append(ConstantsBatchReceiveResult.END_LINE);
+			sql.append(" WT.TREATMENT_ID, W.BA_NO,  W.WRITEOFF_TYPE_ID ").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(" FROM dbo.CL_WRITEOFF W ").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(" INNER JOIN dbo.CL_WRITEOFF_TREATMENT WT ").append(ConstantsBatchReceiveResult.END_LINE);
 			sql.append(" ON W.WRITEOFF_ID = WT.WRITEOFF_ID ").append(ConstantsBatchReceiveResult.END_LINE);
@@ -112,12 +103,13 @@ public class CLWriteOff {
 
 		@Override
 		protected void setReturnValue(ResultSet resultSet) throws SQLException {
-			CLWriteOffTreatementInfo temp = new CLWriteOffTreatementInfo();			
-			temp.setTreatementId(resultSet.getBigDecimal("TREATMENT_ID"));
-			temp.setBaNo(resultSet.getString("BA_NO"));
-			temp.setWriteOffDtm(resultSet.getTimestamp("WRITEOFF_DATE"));
-			temp.setWriteOffTypeId(resultSet.getBigDecimal("WRITEOFF_TYPE_ID"));
-			response.getResponse().add(temp);
+		      if (resultSet != null) {
+		  			CLWriteOffTreatementInfo temp = new CLWriteOffTreatementInfo();			
+					temp.setTreatementId(resultSet.getBigDecimal("TREATMENT_ID"));
+					temp.setBaNo(resultSet.getString("BA_NO"));
+					temp.setWriteOffTypeId(resultSet.getBigDecimal("WRITEOFF_TYPE_ID"));
+					response.getResponse().add(temp);
+		      }
 		}
 
 		protected CLWriteOffInfoResponse execute(BigDecimal batchID) {
@@ -141,7 +133,6 @@ public class CLWriteOff {
 				throw new Exception("Error : " + response.getErrorMsg());
 			}
 		}
-		
 		return response;
 	}
 
