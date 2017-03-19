@@ -15,11 +15,6 @@ import th.co.ais.cpac.cl.template.database.DBConnectionPools;
  */
 public class ConstantsBatchReceiveResult {
 
-	public static int suspendOrderActionID = 10;//dummy 
-	public static int terminateOrderActionID = 4;
-	public static int reconnectOrderID = 12;
-	public static int waiveBatchOrderID = 8;
-	public static int writeOffOrderID = 9;
 	public static String END_LINE = "";
 	
 	public static String suspendJobType="SD";
@@ -31,13 +26,7 @@ public class ConstantsBatchReceiveResult {
 	public static int batchInprogressStatus = 1;
 	public static int batchReceiveStatus = 2;
 	public static int batchCompleteStatus = 3;
-	
-	public static String suspendUsername = "Suspend User";
-	public static String terminateUsername = "Terminate User";
-	public static String reconnectUsername = "Reconnect User";
-	public static String waiveBatchUsername = "Waive Batch User";
-	public static String writeOffUsername = "Write Off Batch User";
-	public static String blacklistUsername = "Blacklist Batch User";
+
 	public static int actInprogressStatus = 3;
 	public static int actSuccessStatus = 4;
 	public static int actIncompleteStatus = 5;
