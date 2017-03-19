@@ -1,17 +1,24 @@
 package th.co.ais.cpac.cl.batch.cmd.updatesffresult;
 
 import java.io.File;
+import java.math.BigDecimal;
 
 import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
+import th.co.ais.cpac.cl.batch.cnf.CNFDatabase;
+import th.co.ais.cpac.cl.batch.db.CLBatch.CLBatchPathInfo;
+import th.co.ais.cpac.cl.batch.template.ProcessTemplate;
+import th.co.ais.cpac.cl.batch.util.BatchUtil;
 import th.co.ais.cpac.cl.batch.util.FileUtil;
+import th.co.ais.cpac.cl.batch.util.LogUtil;
 import th.co.ais.cpac.cl.batch.util.PropertiesReader;
 import th.co.ais.cpac.cl.common.Context;
 
 public class ReceiveSFFWorker {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
+		LogUtil.initialLogger();
 		Context context = new Context();
-		//context.initailLogger(name, header); 
+
 		try{
 			
 			context.initailLogger("LoggerReceive", "ReceiveSFFWorker");
@@ -28,17 +35,19 @@ public class ReceiveSFFWorker {
 			String processPath="";
 			boolean doProcess=true;
 			System.out.println("jobType ->"+jobType);
+			BigDecimal batchTypeId=BatchUtil.getBatchTypeId(jobType);
+			int environment=BatchUtil.getEnvionment();
+
+			CNFDatabase cc = new CNFDatabase(FileUtil.getDBPath());
+			CLBatchPathInfo pathResult=BatchUtil.getBatchPath(context,batchTypeId,environment);
+			
+			inboundSyncPath=pathResult.getPathInbound();
+			inboundDataPath=pathResult.getPathInbound();
 			if(ConstantsBatchReceiveResult.suspendJobType.equals(jobType)){
-				inboundSyncPath= reader.get("suspend.inboundSyncPath");
-				inboundDataPath =reader.get("suspend.inboundDataPath");
 				processPath = reader.get("suspend.processPath");
 			}else if(ConstantsBatchReceiveResult.terminateJobType.equals(jobType)){
-				inboundSyncPath= reader.get("terminate.inboundSyncPath");
-				inboundDataPath= reader.get("terminate.inboundDataPath");
 				processPath = reader.get("terminate.processPath");
 			}else if(ConstantsBatchReceiveResult.reconnectJobType.equals(jobType)){
-				inboundSyncPath= reader.get("reconnect.inboundSyncPath");
-				inboundDataPath= reader.get("reconnect.inboundDataPath");
 				processPath = reader.get("reconnect.processPath");
 			}else{
 				doProcess=false;

@@ -1,8 +1,12 @@
 package th.co.ais.cpac.cl.batch.cmd.waivebatch;
 
 import java.io.File;
+import java.math.BigDecimal;
 
 import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
+import th.co.ais.cpac.cl.batch.cnf.CNFDatabase;
+import th.co.ais.cpac.cl.batch.db.CLBatch.CLBatchPathInfo;
+import th.co.ais.cpac.cl.batch.util.BatchUtil;
 import th.co.ais.cpac.cl.batch.util.FileUtil;
 import th.co.ais.cpac.cl.batch.util.PropertiesReader;
 import th.co.ais.cpac.cl.common.Context;
@@ -23,9 +27,14 @@ public class ReceiveWaiveBatchWorker {
 			String inboundSyncPath="" ;
 			String inboundDataPath="" ;
 			String processPath="";
+			BigDecimal batchTypeId=BatchUtil.getBatchTypeId(jobType);
+			int environment=BatchUtil.getEnvionment();
+
 			if(ConstantsBatchReceiveResult.waiveBatchJobType.equals(jobType)){
-				inboundSyncPath= reader.get("waiveBatch.inboundSyncPath");
-				inboundDataPath =reader.get("waiveBatch.inboundDataPath");
+				CNFDatabase cc = new CNFDatabase(FileUtil.getDBPath());
+				CLBatchPathInfo pathResult=BatchUtil.getBatchPath(context,batchTypeId,environment);
+				inboundSyncPath= pathResult.getPathInbound();
+				inboundDataPath =pathResult.getPathInbound();
 				processPath = reader.get("waiveBatch.processPath");
 			}else{
 				doProcess=false;

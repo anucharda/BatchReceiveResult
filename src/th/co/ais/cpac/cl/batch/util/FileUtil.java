@@ -63,4 +63,12 @@ public class FileUtil {
 		dbPath = reader.get("db.path");
 		return dbPath;
 	}
+	public static String getLogPath() throws Exception {
+		// TODO Auto-generated method stub
+		String logPath = "";
+		PropertiesReader reader = new PropertiesReader("th.co.ais.cpac.cl.batch.properties.resource",
+				"SystemConfigPath");
+		logPath = reader.get("log.path");
+		return logPath;
+	}
 }

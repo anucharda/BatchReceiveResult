@@ -1,8 +1,12 @@
 package th.co.ais.cpac.cl.batch.cmd.writeoff;
 
 import java.io.File;
+import java.math.BigDecimal;
 
 import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
+import th.co.ais.cpac.cl.batch.cnf.CNFDatabase;
+import th.co.ais.cpac.cl.batch.db.CLBatch.CLBatchPathInfo;
+import th.co.ais.cpac.cl.batch.util.BatchUtil;
 import th.co.ais.cpac.cl.batch.util.FileUtil;
 import th.co.ais.cpac.cl.batch.util.PropertiesReader;
 import th.co.ais.cpac.cl.common.Context;
@@ -23,9 +27,16 @@ public class ReceiveWriteOffBatchWorker {
 				String inboundAckPath="" ;
 				String inboundDataPath="" ;
 				String processPath="";
+
+				
+				BigDecimal batchTypeId=BatchUtil.getBatchTypeId(jobType);
+				int environment=BatchUtil.getEnvionment();
+
 				if(ConstantsBatchReceiveResult.writeOffJobType.equals(jobType)){
-					inboundAckPath= reader.get("writeOff.inboundAckPath");
-					inboundDataPath =reader.get("writeOff.inboundDataPath");
+					CNFDatabase cc = new CNFDatabase(FileUtil.getDBPath());
+					CLBatchPathInfo pathResult=BatchUtil.getBatchPath(context,batchTypeId,environment);
+					inboundAckPath= pathResult.getPathInbound();
+					inboundDataPath =pathResult.getPathInbound();
 					processPath = reader.get("writeOff.processPath");
 				}else{
 					doProcess=false;

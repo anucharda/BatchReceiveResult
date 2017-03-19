@@ -1,19 +1,24 @@
 package th.co.ais.cpac.cl.batch.cmd.blacklist;
 
 import java.io.File;
+import java.math.BigDecimal;
 
 import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
+import th.co.ais.cpac.cl.batch.cnf.CNFDatabase;
+import th.co.ais.cpac.cl.batch.db.CLBatch.CLBatchPathInfo;
+import th.co.ais.cpac.cl.batch.util.BatchUtil;
 import th.co.ais.cpac.cl.batch.util.FileUtil;
+import th.co.ais.cpac.cl.batch.util.LogUtil;
 import th.co.ais.cpac.cl.batch.util.PropertiesReader;
 import th.co.ais.cpac.cl.common.Context;
 
 public class ReceiveBlackListWorker {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
+		LogUtil.initialLogger();
 		Context context = new Context();
-		//context.initailLogger(name, header); 
 		try{
-			
+
 			context.initailLogger("LoggerReceive", "ReceiveBlackListWorker");
 			// TODO Auto-generated method stub
 			context.getLogger().info("----------------------- Start ReceiveBlackListWorker -----------------------");
@@ -21,7 +26,9 @@ public class ReceiveBlackListWorker {
 			PropertiesReader reader = new PropertiesReader("th.co.ais.cpac.cl.batch.properties.resource","SystemConfigPath");
 		
 			String jobType=args[0];//From Parameter
-		
+			BigDecimal batchTypeId=BatchUtil.getBatchTypeId(jobType);
+			int environment=BatchUtil.getEnvionment();
+
 			//Find sync file on path.
 			String inboundSyncPath="" ;
 			String inboundDataPath="" ;
@@ -29,8 +36,10 @@ public class ReceiveBlackListWorker {
 			boolean doProcess=true;
 			System.out.println("jobType ->"+jobType);
 			if(ConstantsBatchReceiveResult.blacklistJobType.equals(jobType)){
-				inboundSyncPath= reader.get("blacklist.inboundSyncPath");
-				inboundDataPath =reader.get("blacklist.inboundDataPath");
+				CNFDatabase cc = new CNFDatabase(FileUtil.getDBPath());
+				CLBatchPathInfo pathResult=BatchUtil.getBatchPath(context,batchTypeId,environment);
+				inboundSyncPath= pathResult.getPathInbound();
+				inboundDataPath =pathResult.getPathInbound();
 				processPath = reader.get("blacklist.processPath");
 			}else{
 				doProcess=false;

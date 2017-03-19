@@ -307,7 +307,7 @@ public class CLBatch {
 		  }
 
 		  protected class GetCLBatchPath extends DBTemplatesExecuteQuery<CLBatchPathResponse, UtilityLogger, DBConnectionPools> {
-
+ 
 		    public GetCLBatchPath(UtilityLogger logger) {
 		      super(logger);
 		    }
@@ -324,9 +324,10 @@ public class CLBatch {
 		      sql.append(" SELECT BATCH_TYPE_ID, ENVIRONMENT, PATH_OUTBOUND, PATH_INBOUND, RECORD_STATUS ");
 		      sql.append(" FROM dbo.CL_BATCH_PATH ");
 		      sql.append(" WHERE BATCH_TYPE_ID = ").append(batchTypeId.toPlainString()).append(" and RECORD_STATUS = 1 ");
+		      sql.append(" AND ENVIRONMENT = ").append(environment);
 		      return sql;
 		    }
-
+		    private int environment;
 		    private BigDecimal batchTypeId;
 
 		    @Override
@@ -338,14 +339,15 @@ public class CLBatch {
 		      temp.setPathInbound(resultSet.getString("PATH_INBOUND"));
 		    }
 
-		    protected CLBatchPathResponse execute(BigDecimal batchTypeId) {
+		    protected CLBatchPathResponse execute(BigDecimal batchTypeId,int environment) {
 		      this.batchTypeId = batchTypeId;
+		      this.environment=environment;
 		      return executeQuery(ConstantsBatchReceiveResult.getDBConnectionPools(logger), true);
 		    }
 
 		  }
 
-		  public CLBatchPathResponse getCLBatchPath(BigDecimal batchTypeId) {
-		    return new GetCLBatchPath(logger).execute(batchTypeId);
+		  public CLBatchPathResponse getCLBatchPath(BigDecimal batchTypeId,int environment) {
+		    return new GetCLBatchPath(logger).execute(batchTypeId,environment);
 		  }
 }
