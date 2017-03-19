@@ -3,7 +3,7 @@ package th.co.ais.cpac.cl.batch.cmd.waivebatch;
 import java.io.File;
 import java.math.BigDecimal;
 
-import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
+import th.co.ais.cpac.cl.batch.ConstantsBusinessUtil;
 import th.co.ais.cpac.cl.batch.cnf.CNFDatabase;
 import th.co.ais.cpac.cl.batch.db.CLBatch.CLBatchPathInfo;
 import th.co.ais.cpac.cl.batch.util.BatchUtil;
@@ -30,7 +30,7 @@ public class ReceiveWaiveBatchWorker {
 			BigDecimal batchTypeId=BatchUtil.getBatchTypeId(jobType);
 			int environment=BatchUtil.getEnvionment();
 
-			if(ConstantsBatchReceiveResult.waiveBatchJobType.equals(jobType)){
+			if(ConstantsBusinessUtil.waiveBatchJobType.equals(jobType)){
 				CNFDatabase cc = new CNFDatabase(FileUtil.getDBPath());
 				CLBatchPathInfo pathResult=BatchUtil.getBatchPath(context,batchTypeId,environment);
 				inboundSyncPath= pathResult.getPathInbound();

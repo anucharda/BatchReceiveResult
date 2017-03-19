@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 
 import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
+import th.co.ais.cpac.cl.batch.ConstantsBusinessUtil;
 import th.co.ais.cpac.cl.batch.bean.UpdateResultWaiveBatchBean;
 import th.co.ais.cpac.cl.batch.db.CLBatch;
 import th.co.ais.cpac.cl.batch.db.CLBatch.CLBatchInfo;
@@ -47,7 +48,7 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 
 		try {
 			context.getLogger().info("Start WorkerReceive....");
-			context.getLogger().info("jobType->" + Utility.getJobName(ConstantsBatchReceiveResult.waiveBatchJobType));
+			context.getLogger().info("jobType->" + Utility.getJobName(ConstantsBusinessUtil.waiveBatchJobType));
 			context.getLogger().info("SyncFileName->" + syncFileName);
 			/***** START LOOP ******/
 			// 1.Rename file.sync to .dat
@@ -56,7 +57,7 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 			// 2. Find Batch ID by fileDatExtName
 			CLBatch batchDB = new CLBatch(context.getLogger());
 			CLBatchInfo result = batchDB.getBatchInfoByFileName(ConstantsBatchReceiveResult.batchInprogressStatus, inboundFileName,context);
-			String username = Utility.getusername(ConstantsBatchReceiveResult.waiveBatchJobType);
+			String username = Utility.getusername(ConstantsBusinessUtil.waiveBatchJobType);
 			if (result != null) {
 				batchID = result.getBatchId();
 				batchDB.updateInboundReceiveStatus(ConstantsBatchReceiveResult.batchReceiveStatus, batchID, syncFileName, username,context);

@@ -4,6 +4,7 @@ import java.io.File;
 import java.math.BigDecimal;
 
 import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
+import th.co.ais.cpac.cl.batch.ConstantsBusinessUtil;
 import th.co.ais.cpac.cl.batch.cnf.CNFDatabase;
 import th.co.ais.cpac.cl.batch.db.CLBatch.CLBatchPathInfo;
 import th.co.ais.cpac.cl.batch.util.BatchUtil;
@@ -35,7 +36,7 @@ public class ReceiveBlackListWorker {
 			String processPath="";
 			boolean doProcess=true;
 			System.out.println("jobType ->"+jobType);
-			if(ConstantsBatchReceiveResult.blacklistJobType.equals(jobType)){
+			if(ConstantsBusinessUtil.blacklistJobType.equals(jobType)){
 				CNFDatabase cc = new CNFDatabase(FileUtil.getDBPath());
 				CLBatchPathInfo pathResult=BatchUtil.getBatchPath(context,batchTypeId,environment);
 				inboundSyncPath= pathResult.getPathInbound();

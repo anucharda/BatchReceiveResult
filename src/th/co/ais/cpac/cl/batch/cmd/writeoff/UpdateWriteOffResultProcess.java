@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
+import th.co.ais.cpac.cl.batch.ConstantsBusinessUtil;
 import th.co.ais.cpac.cl.batch.bean.UpdateResultWriteOffBean;
 import th.co.ais.cpac.cl.batch.db.CLBaInfo;
 import th.co.ais.cpac.cl.batch.db.CLBatch;
@@ -46,7 +47,7 @@ public class UpdateWriteOffResultProcess extends ProcessTemplate {
 
 		try {
 			context.getLogger().info("Start WorkerReceive....");
-			context.getLogger().info("jobType->" + Utility.getJobName(ConstantsBatchReceiveResult.writeOffJobType));
+			context.getLogger().info("jobType->" + Utility.getJobName(ConstantsBusinessUtil.writeOffJobType));
 			context.getLogger().info("AckFileName->" + ackFileName);
 			/***** START LOOP ******/
 			// 1.Rename file.sync to .dat
@@ -59,7 +60,7 @@ public class UpdateWriteOffResultProcess extends ProcessTemplate {
 				
 				
 				
-				String username = Utility.getusername(ConstantsBatchReceiveResult.writeOffJobType);
+				String username = Utility.getusername(ConstantsBusinessUtil.writeOffJobType);
 				if (result != null) {
 					// 2.1 Update File Batch
 					batchID = result.getBatchId();

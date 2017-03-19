@@ -14,13 +14,6 @@ import th.co.ais.cpac.cl.template.database.DBConnectionPools;
  * @author Sirirat
  */
 public class ConstantsBatchReceiveResult {
-
-	public static String suspendJobType="SD";
-	public static String terminateJobType="DT";
-	public static String reconnectJobType="RC";
-	public static String waiveBatchJobType="WA";
-	public static String writeOffJobType ="WO";
-	public static String blacklistJobType="BL";
 	public static int batchInprogressStatus = 1;
 	public static int batchReceiveStatus = 2;
 	public static int batchCompleteStatus = 3;

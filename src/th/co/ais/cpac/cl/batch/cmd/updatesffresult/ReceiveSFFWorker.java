@@ -4,9 +4,9 @@ import java.io.File;
 import java.math.BigDecimal;
 
 import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
+import th.co.ais.cpac.cl.batch.ConstantsBusinessUtil;
 import th.co.ais.cpac.cl.batch.cnf.CNFDatabase;
 import th.co.ais.cpac.cl.batch.db.CLBatch.CLBatchPathInfo;
-import th.co.ais.cpac.cl.batch.template.ProcessTemplate;
 import th.co.ais.cpac.cl.batch.util.BatchUtil;
 import th.co.ais.cpac.cl.batch.util.FileUtil;
 import th.co.ais.cpac.cl.batch.util.LogUtil;
@@ -43,11 +43,11 @@ public class ReceiveSFFWorker {
 			
 			inboundSyncPath=pathResult.getPathInbound();
 			inboundDataPath=pathResult.getPathInbound();
-			if(ConstantsBatchReceiveResult.suspendJobType.equals(jobType)){
+			if(ConstantsBusinessUtil.suspendJobType.equals(jobType)){
 				processPath = reader.get("suspend.processPath");
-			}else if(ConstantsBatchReceiveResult.terminateJobType.equals(jobType)){
+			}else if(ConstantsBusinessUtil.terminateJobType.equals(jobType)){
 				processPath = reader.get("terminate.processPath");
-			}else if(ConstantsBatchReceiveResult.reconnectJobType.equals(jobType)){
+			}else if(ConstantsBusinessUtil.reconnectJobType.equals(jobType)){
 				processPath = reader.get("reconnect.processPath");
 			}else{
 				doProcess=false;

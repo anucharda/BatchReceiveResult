@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 
 import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
+import th.co.ais.cpac.cl.batch.ConstantsBusinessUtil;
 import th.co.ais.cpac.cl.batch.bean.UpdateResultSSFBean;
 import th.co.ais.cpac.cl.batch.db.CLBatch;
 import th.co.ais.cpac.cl.batch.db.CLBatch.CLBatchInfo;
@@ -50,8 +51,8 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 			context.getLogger().info("jobType->" +  Utility.getJobName(jobType));
 			context.getLogger().info("fileNames->" + fileNames.toString());
 
-			if (ConstantsBatchReceiveResult.suspendJobType.equals(jobType) || ConstantsBatchReceiveResult.terminateJobType.equals(jobType)
-					|| ConstantsBatchReceiveResult.reconnectJobType.equals(jobType)) {
+			if (ConstantsBusinessUtil.suspendJobType.equals(jobType) || ConstantsBusinessUtil.terminateJobType.equals(jobType)
+					|| ConstantsBusinessUtil.reconnectJobType.equals(jobType)) {
 
 				/***** START LOOP ******/
 				// 1.for loop file ใน Sync

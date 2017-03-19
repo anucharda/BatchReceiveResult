@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.math.BigDecimal;
 
 import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
+import th.co.ais.cpac.cl.batch.ConstantsBusinessUtil;
 import th.co.ais.cpac.cl.batch.bean.UpdateResultBlacklistBean;
 import th.co.ais.cpac.cl.batch.db.CLBatch;
 import th.co.ais.cpac.cl.batch.db.CLBatch.CLBatchInfo;
@@ -47,7 +48,7 @@ public class UpdateBlacklistResultProcess extends ProcessTemplate {
 			context.getLogger().info("jobType->" +  Utility.getJobName(jobType));
 			context.getLogger().info("fileName->" + fileName);
 
-			if (ConstantsBatchReceiveResult.blacklistJobType.equals(jobType)) {
+			if (ConstantsBusinessUtil.blacklistJobType.equals(jobType)) {
 
 				String batchFileName = fileName;
 				BigDecimal batchID = null;
