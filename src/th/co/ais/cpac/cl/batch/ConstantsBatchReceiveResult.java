@@ -15,8 +15,6 @@ import th.co.ais.cpac.cl.template.database.DBConnectionPools;
  */
 public class ConstantsBatchReceiveResult {
 
-	public static String END_LINE = "";
-	
 	public static String suspendJobType="SD";
 	public static String terminateJobType="DT";
 	public static String reconnectJobType="RC";
