@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import th.co.ais.cpac.cl.batch.ConstantsBusinessUtil;
 import th.co.ais.cpac.cl.batch.cnf.CNFDatabase;
 import th.co.ais.cpac.cl.batch.db.CLBatch.CLBatchPathInfo;
+import th.co.ais.cpac.cl.batch.util.BatchReceiveUtil;
 import th.co.ais.cpac.cl.batch.util.BatchUtil;
 import th.co.ais.cpac.cl.batch.util.FileUtil;
 import th.co.ais.cpac.cl.batch.util.PropertiesReader;
@@ -34,7 +35,7 @@ public class ReceiveWriteOffBatchWorker {
 
 				if(ConstantsBusinessUtil.writeOffJobType.equals(jobType)){
 					CNFDatabase cc = new CNFDatabase(FileUtil.getDBPath());
-					CLBatchPathInfo pathResult=BatchUtil.getBatchPath(context,batchTypeId,environment);
+					CLBatchPathInfo pathResult=BatchReceiveUtil.getBatchPath(context,batchTypeId,environment);
 					inboundAckPath= pathResult.getPathInbound();
 					inboundDataPath =pathResult.getPathInbound();
 					processPath = reader.get("writeOff.processPath");
