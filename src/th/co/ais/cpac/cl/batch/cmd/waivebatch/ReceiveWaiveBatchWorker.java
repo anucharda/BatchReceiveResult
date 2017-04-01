@@ -2,6 +2,8 @@ package th.co.ais.cpac.cl.batch.cmd.waivebatch;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import th.co.ais.cpac.cl.batch.ConstantsBusinessUtil;
 import th.co.ais.cpac.cl.batch.cnf.CNFDatabase;
@@ -16,6 +18,7 @@ public class ReceiveWaiveBatchWorker {
 
 	public static void main(String[] args) {
 		Context context = new Context();
+		int limitConcurrentThread = 5;
 		try{
 			context.initailLogger("LoggerReceiveSFFWorker", "ReceiveWaiveBatchWorker");
 			// TODO Auto-generated method stub
@@ -47,6 +50,16 @@ public class ReceiveWaiveBatchWorker {
 
 				if(files!=null && files.length>0){
 					context.getLogger().info("Sync file size --> "+files.length);
+					try{
+						limitConcurrentThread=Integer.parseInt(reader.get("sff.limit.concurrent.thread"));
+						if(limitConcurrentThread==0){ //Set 0 is same total thread.
+							limitConcurrentThread=files.length;
+						}
+					}catch(Exception e){
+						limitConcurrentThread=files.length;
+					}
+					ExecutorService executorService = Executors.newFixedThreadPool(limitConcurrentThread);
+					
 					//Loop for do all sync file.
 					for(int i=0; i<files.length; i++){
 						String doPath = processPath;
@@ -77,9 +90,13 @@ public class ReceiveWaiveBatchWorker {
 							throw new Exception("Error occur delete file from inbound directory --> "+sourceSyncFile.getParent());
 						}
 						//New thread for execute process.
-						new Thread ( () -> execute(context, doPath, syncFileName, dataFileName) ).start();
+						executorService.execute(new ReceiveWaiveBatchWorkerThread(context, processPath, syncFileName, dataFileName));
+						//new Thread ( () -> execute(context, doPath, syncFileName, dataFileName) ).start();
 					}
-
+					executorService.shutdown();
+					while(!executorService.isTerminated()){
+						//sleep(500);
+					}
 				}else{
 					context.getLogger().info("Not found sync file in directory --> "+inboundSyncPath);
 				}
@@ -92,13 +109,13 @@ public class ReceiveWaiveBatchWorker {
 		}
 	}
 
-	public static void execute(Context context, String processPath,String syncFileName,String inboundFileName) {
-		context.getLogger().info("Start UpdateWaiveBatchResultProcess Execute....");
-		// Check จากชื่อไฟล์ว่าเป็น batch suspense/reconnect/terminate
-
-		context.getLogger().info("Trigger UpdateWaiveBatchResultProcess....");
-		new UpdateWaiveBatchResultProcess().executeProcess(context, processPath,syncFileName,inboundFileName); 
-		context.getLogger().info("End UpdateWaiveBatchResultProcess Execute....");
-	}
+//	public static void execute(Context context, String processPath,String syncFileName,String inboundFileName) {
+//		context.getLogger().info("Start UpdateWaiveBatchResultProcess Execute....");
+//		// Check จากชื่อไฟล์ว่าเป็น batch suspense/reconnect/terminate
+//
+//		context.getLogger().info("Trigger UpdateWaiveBatchResultProcess....");
+//		new UpdateWaiveBatchResultProcess().executeProcess(context, processPath,syncFileName,inboundFileName); 
+//		context.getLogger().info("End UpdateWaiveBatchResultProcess Execute....");
+//	}
 
 }

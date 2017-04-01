@@ -2,6 +2,8 @@ package th.co.ais.cpac.cl.batch.cmd.blacklist;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import th.co.ais.cpac.cl.batch.ConstantsBatchReceiveResult;
 import th.co.ais.cpac.cl.batch.ConstantsBusinessUtil;
@@ -17,10 +19,9 @@ import th.co.ais.cpac.cl.common.Context;
 public class ReceiveBlackListWorker {
 
 	public static void main(String[] args) throws Exception {
-		LogUtil.initialLogger();
 		Context context = new Context();
+		int limitConcurrentThread = 5;
 		try{
-
 			context.initailLogger("LoggerReceive", "ReceiveBlackListWorker");
 			// TODO Auto-generated method stub
 			context.getLogger().info("----------------------- Start ReceiveBlackListWorker -----------------------");
@@ -60,6 +61,17 @@ public class ReceiveBlackListWorker {
 					if(files.length>totalThread){
 						loopCnt=totalThread;
 					}
+					
+					try{
+						limitConcurrentThread=Integer.parseInt(reader.get("sff.limit.concurrent.thread"));
+						if(limitConcurrentThread==0){ //Set 0 is same total thread.
+							limitConcurrentThread=loopCnt;
+						}
+					}catch(Exception e){
+						limitConcurrentThread=loopCnt;
+					}
+					ExecutorService executorService = Executors.newFixedThreadPool(limitConcurrentThread);
+				
 					//Loop for do all sync file.
 					for(int i=0; i<loopCnt; i++){
 						String doPath = processPath;
@@ -98,10 +110,14 @@ public class ReceiveBlackListWorker {
 							throw new Exception("Error occur delete file from inbound directory --> "+sourceSyncFile.getParent());
 						}
 						//New thread for execute process.
-						new Thread ( () -> execute(context, jobType,fileNames[0],doPath) ).start();
+						executorService.execute(new ReceiveBlackListWorkerThread(context, jobType, fileNames[0], processPath));
+						//new Thread ( () -> execute(context, jobType,fileNames[0],doPath) ).start();
 						//execute(context, jobType,fileNames,doPath);
 					}
-
+					executorService.shutdown();
+					while(!executorService.isTerminated()){
+						//sleep(500);
+					}
 				}else{
 					context.getLogger().info("Not found sync file in directory --> "+inboundSyncPath);
 				}
@@ -115,12 +131,11 @@ public class ReceiveBlackListWorker {
 		}
 	}
 	
-	public static void execute(Context context,String jobType,String fileName,String processPath){
-		 context.getLogger().info("Start UpdateSFFResultProcess Execute....");
-		 context.getLogger().info("Trigger Update SSF Result Process....");
-		 new UpdateBlacklistResultProcess().executeProcess(context,jobType,fileName,processPath);
-		 context.getLogger().info("End UpdateSFFResultProcess Execute....");
-	}
-	
+//	public static void execute(Context context,String jobType,String fileName,String processPath){
+//		 context.getLogger().info("Start UpdateSFFResultProcess Execute....");
+//		 context.getLogger().info("Trigger Update SSF Result Process....");
+//		 new UpdateBlacklistResultProcess().executeProcess(context,jobType,fileName,processPath);
+//		 context.getLogger().info("End UpdateSFFResultProcess Execute....");
+//	}
 	
 }

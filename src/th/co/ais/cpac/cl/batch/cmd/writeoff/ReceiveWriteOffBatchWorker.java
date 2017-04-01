@@ -2,6 +2,8 @@ package th.co.ais.cpac.cl.batch.cmd.writeoff;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import th.co.ais.cpac.cl.batch.ConstantsBusinessUtil;
 import th.co.ais.cpac.cl.batch.cnf.CNFDatabase;
@@ -16,6 +18,7 @@ public class ReceiveWriteOffBatchWorker {
 
 	public static void main(String[] args) {
 		Context context = new Context();
+		int limitConcurrentThread = 5;
 		try{
 				context.initailLogger("LoggerReceiveSFFWorker", "ReceiveWriteOffBatchWorker");
 				// TODO Auto-generated method stub
@@ -49,6 +52,17 @@ public class ReceiveWriteOffBatchWorker {
 					if(files!=null && files.length>0){
 						context.getLogger().info("Ack file size --> "+files.length);
 						//Loop for do all sync file.
+						
+						try{
+							limitConcurrentThread=Integer.parseInt(reader.get("sff.limit.concurrent.thread"));
+							if(limitConcurrentThread==0){ //Set 0 is same total thread.
+								limitConcurrentThread=files.length;
+							}
+						}catch(Exception e){
+							limitConcurrentThread=files.length;
+						}
+						ExecutorService executorService = Executors.newFixedThreadPool(limitConcurrentThread);
+						
 						for(int i=0; i<files.length; i++){
 							String doPath = processPath;
 							String ackFile = files[i].getPath();
@@ -79,7 +93,12 @@ public class ReceiveWriteOffBatchWorker {
 							}
 							
 							//New thread for execute process.
-							new Thread ( () -> execute(context, doPath, ackFileName, dataFileName) ).start();
+							executorService.execute(new ReceiveWriteOffBatchWorkerThread(context, processPath, ackFileName, dataFileName));
+							//new Thread ( () -> execute(context, doPath, ackFileName, dataFileName) ).start();
+						}
+						executorService.shutdown();
+						while(!executorService.isTerminated()){
+							//sleep(500);
 						}
 					}else{
 						context.getLogger().info("Not found ack file in directory --> "+inboundAckPath);
@@ -94,12 +113,12 @@ public class ReceiveWriteOffBatchWorker {
 		}
 	}
 	
-	public static void execute(Context context,String processPath,String ackFileName,String inboundFileName){
-		 context.getLogger().info("Start UpdateWriteOffResultProcess Execute....");		
-		 context.getLogger().info("Trigger UpdateWriteOffResultProcess....");
-		 new UpdateWriteOffResultProcess().executeProcess(context,processPath,ackFileName,inboundFileName); 
-		 context.getLogger().info("End UpdateWriteOffResultProcess Execute....");
-	}
+//	public static void execute(Context context,String processPath,String ackFileName,String inboundFileName){
+//		 context.getLogger().info("Start UpdateWriteOffResultProcess Execute....");		
+//		 context.getLogger().info("Trigger UpdateWriteOffResultProcess....");
+//		 new UpdateWriteOffResultProcess().executeProcess(context,processPath,ackFileName,inboundFileName); 
+//		 context.getLogger().info("End UpdateWriteOffResultProcess Execute....");
+//	}
 	
 
 }
