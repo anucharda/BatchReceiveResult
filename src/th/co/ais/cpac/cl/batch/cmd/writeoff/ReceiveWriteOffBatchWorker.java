@@ -13,6 +13,7 @@ import th.co.ais.cpac.cl.batch.util.BatchUtil;
 import th.co.ais.cpac.cl.batch.util.FileUtil;
 import th.co.ais.cpac.cl.batch.util.PropertiesReader;
 import th.co.ais.cpac.cl.common.Context;
+import th.co.ais.cpac.cl.common.UtilityLogger;
 
 public class ReceiveWriteOffBatchWorker {
 
@@ -20,6 +21,7 @@ public class ReceiveWriteOffBatchWorker {
 		Context context = new Context();
 		int limitConcurrentThread = 5;
 		try{
+				UtilityLogger.initailLogger(FileUtil.getLogPath());
 				context.initailLogger("LoggerReceiveSFFWorker", "ReceiveWriteOffBatchWorker");
 				// TODO Auto-generated method stub
 				context.getLogger().info("----------------------- Start ReceiveWriteOffBatchWorker -----------------------");

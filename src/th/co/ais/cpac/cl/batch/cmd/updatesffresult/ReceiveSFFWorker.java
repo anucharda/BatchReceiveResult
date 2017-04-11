@@ -14,11 +14,17 @@ import th.co.ais.cpac.cl.batch.util.BatchUtil;
 import th.co.ais.cpac.cl.batch.util.FileUtil;
 import th.co.ais.cpac.cl.batch.util.LogUtil;
 import th.co.ais.cpac.cl.batch.util.PropertiesReader;
+import th.co.ais.cpac.cl.batch.util.Utility;
 import th.co.ais.cpac.cl.common.Context;
+import th.co.ais.cpac.cl.common.UtilityLogger;
 
 public class ReceiveSFFWorker {
 
 	public static void main(String[] args) throws Exception {
+		
+		UtilityLogger.initailLogger(FileUtil.getLogPath());
+		
+		
 		Context context = new Context();
 		int limitConcurrentThread = 5;
 		try{
