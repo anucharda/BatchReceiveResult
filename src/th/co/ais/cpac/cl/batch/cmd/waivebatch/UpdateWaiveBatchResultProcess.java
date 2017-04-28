@@ -85,7 +85,7 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 							} else if ("02".equals(dataContentArr[0])) {
 								// 4.Read Body File
 								// 4.1 Read per record
-								if (dataContentArr.length == 19) {
+								if (dataContentArr.length == 18) {
 									UpdateResultWaiveBatchBean request = new UpdateResultWaiveBatchBean();
 									request.setBaNo(dataContentArr[3]);
 									request.setBatchID(batchID);
