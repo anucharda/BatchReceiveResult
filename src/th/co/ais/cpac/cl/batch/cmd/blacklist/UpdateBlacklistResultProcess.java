@@ -114,7 +114,7 @@ public class UpdateBlacklistResultProcess extends ProcessTemplate {
 									}
 
 								} else {
-									throw new Exception("Not Find Content in record ");
+									break;
 								}
 							}
 						}finally{

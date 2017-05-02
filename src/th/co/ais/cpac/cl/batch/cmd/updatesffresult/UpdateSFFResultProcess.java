@@ -161,7 +161,7 @@ public class UpdateSFFResultProcess extends ProcessTemplate {
 									}
 
 								} else {
-									throw new Exception("Not Find Content in record ");
+									break;
 								}
 							}
 						}finally{

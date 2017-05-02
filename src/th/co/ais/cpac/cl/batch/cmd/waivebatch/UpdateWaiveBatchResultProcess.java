@@ -75,7 +75,9 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 				String sCurrentLine;
 				while ((sCurrentLine = br.readLine()) != null) {
 					String dataContent = sCurrentLine;
+					
 					if (!ValidateUtil.isNull(dataContent)) {
+						dataContent=dataContent+"|X";
 						String[] dataContentArr = dataContent.split(ConstantsBatchReceiveResult.PIPE);
 						if (dataContentArr != null && dataContentArr.length > 0) {
 							// 3.Find Batch ID & Update Batch to Receive
@@ -85,20 +87,20 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 							} else if ("02".equals(dataContentArr[0])) {
 								// 4.Read Body File
 								// 4.1 Read per record
-								if (dataContentArr.length == 18) {
+								if (dataContentArr.length == 19) {
 									UpdateResultWaiveBatchBean request = new UpdateResultWaiveBatchBean();
-									request.setBaNo(dataContentArr[3]);
+									request.setBaNo(dataContentArr[2]);
 									request.setBatchID(batchID);
-									request.setInvoiceNumb(dataContentArr[4]);
-									request.setAmount(new BigDecimal(dataContentArr[15]));
+									request.setInvoiceNumb(dataContentArr[3]);
+									request.setAmount(new BigDecimal(dataContentArr[14]));
 									request.setFileName(syncFileName);
-									if ("Y".equals(dataContentArr[16])) {
+									if ("Y".equals(dataContentArr[15])) {
 										request.setActionStatus(ConstantsBatchReceiveResult.actSuccessStatus);
 										request.setAdjStatus(ConstantsBatchReceiveResult.adjCompleteStatus);
 									} else {
 										request.setActionStatus(ConstantsBatchReceiveResult.actFailStatus);
 										request.setAdjStatus(ConstantsBatchReceiveResult.adjFailStatus);
-										request.setFailReason(dataContentArr[17] + ":" + dataContentArr[18]);
+										request.setFailReason(dataContentArr[16] + ":" + dataContentArr[17]);
 									}
 									// 4.2 Find INVOICE_ID
 									request = findInvoiceIDAndBatchDtlID(request);
@@ -128,7 +130,7 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 						}
 
 					} else {
-						throw new Exception("Not Find Content in record ");
+						break;
 					}
 				}
 			} finally {
@@ -196,22 +198,22 @@ public class UpdateWaiveBatchResultProcess extends ProcessTemplate {
 		if (pmInvoiceResult != null && pmInvoiceResult.getResponse() != null
 				&& pmInvoiceResult.getResponse().size() > 0) {
 			if (pmInvoiceResult.getResponse().size() == 1) {
-				request.setInvoiceID(pmInvoiceResult.getResponse().get(1).getInvoiceID());
+				request.setInvoiceID(pmInvoiceResult.getResponse().get(0).getInvoiceID());
 				PMBatchAdjDtl pmBatchAdjDtlDB = new PMBatchAdjDtl(context.getLogger());
 				PMBatchAdjInfoResponse pmBatchAdjResult = pmBatchAdjDtlDB.getBatchDtlIDByInvoiceID(
-						pmInvoiceResult.getResponse().get(1).getInvoiceID(), request.getAmount(),
+						pmInvoiceResult.getResponse().get(0).getInvoiceID(), request.getAmount(),
 						request.getAdjStatus(),context);
 				if (pmBatchAdjResult != null && pmBatchAdjResult.getResponse() != null
 						&& pmBatchAdjResult.getResponse().size() > 0) {
 					if (pmBatchAdjResult.getResponse().size() == 1) {
-						request.setBatchAdjDtlID(pmBatchAdjResult.getResponse().get(1).getBatchDtlID());
+						request.setBatchAdjDtlID(pmBatchAdjResult.getResponse().get(0).getReqDtlID());
 					} else {
 						context.getLogger().info(
-								"More than record Invoice ID :" + pmInvoiceResult.getResponse().get(1).getInvoiceID());
+								"More than record Invoice ID :" + pmInvoiceResult.getResponse().get(0).getInvoiceID());
 					}
 				} else {
 					context.getLogger()
-							.info("No record Invoice ID :" + pmInvoiceResult.getResponse().get(1).getInvoiceID());
+							.info("No record Invoice ID :" + pmInvoiceResult.getResponse().get(0).getInvoiceID());
 				}
 			} else {
 				context.getLogger().info("More than record Invoice Numb :" + request.getInvoiceNumb());
