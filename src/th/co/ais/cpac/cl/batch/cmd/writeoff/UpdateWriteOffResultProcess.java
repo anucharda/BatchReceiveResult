@@ -180,27 +180,16 @@ public class UpdateWriteOffResultProcess extends ProcessTemplate {
 						}
 					}
 					/*Call Store Procedure*/
-					PMSUpdateWriteOff pmsUpdateWriteOffDB =new PMSUpdateWriteOff(context.getLogger());
+					/*PMSUpdateWriteOff pmsUpdateWriteOffDB =new PMSUpdateWriteOff(context.getLogger());
 					PMSUpdateWriteOffInfoResponse updatePMWriteOff=pmsUpdateWriteOffDB.updateWriteOff(writeOffInfo.getBaNo(),invoiceNum.toString());
-					
+					*/
 					/*Update Treatment*/
 					CLTreatment treatmentDB = new CLTreatment(context.getLogger());
-					if(updatePMWriteOff!=null && updatePMWriteOff.getResponse()!=null && updatePMWriteOff.getResponse().size()>0){
-						if(ValidateUtil.isNull(updatePMWriteOff.getResponse().get(0).getRetCode())){
-							/*Update Treatment Success*/
-							treatmentDB.updateTreatmentReceive(ConstantsBatchReceiveResult.actSuccessStatus, writeOffInfo.getTreatementId(), username, "", context);
-							/*Update BA Info*/
-							CLBaInfo baInfoDB = new CLBaInfo(context.getLogger());
-							baInfoDB.updateTreatmentReceive(writeOffInfo.getBaNo(), writeOffDate,writeOffInfo.getWriteOffTypeId(), username,context);
-						}else{
-							/*Update Treatment Fail*/
-							treatmentDB.updateTreatmentReceive(ConstantsBatchReceiveResult.actFailStatus, writeOffInfo.getTreatementId(), username, updatePMWriteOff.getResponse().get(0).getRetMsg(), context);
-
-						}
-					}
-					
-					
-					
+					/*Update Treatment Success*/
+					treatmentDB.updateTreatmentReceive(ConstantsBatchReceiveResult.actSuccessStatus, writeOffInfo.getTreatementId(), username, "", context);
+					/*Update BA Info*/
+					CLBaInfo baInfoDB = new CLBaInfo(context.getLogger());
+					baInfoDB.updateTreatmentReceive(writeOffInfo.getBaNo(), writeOffDate,writeOffInfo.getWriteOffTypeId(), username,context);
 				}else{
 					context.getLogger().info("No Found Invoice Number BA->" +writeOffInfo.getBaNo());
 				}
