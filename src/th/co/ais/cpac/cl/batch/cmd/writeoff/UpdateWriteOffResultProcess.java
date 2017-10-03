@@ -168,7 +168,7 @@ public class UpdateWriteOffResultProcess extends ProcessTemplate {
 				/*Find Invoice Num by BA_NO*/
 				PMInvoice pmInvoiceDB = new PMInvoice(context.getLogger());
 				PMInvoiceNumResponse invoiceNumResult=pmInvoiceDB.getInvoiceNumbByBaNo(writeOffInfo.getBaNo(), context);
-				if(invoiceNumResult!=null && invoiceNumResult.getResponse()!=null && invoiceNumResult.getResponse().size()>0){
+				/*if(invoiceNumResult!=null && invoiceNumResult.getResponse()!=null && invoiceNumResult.getResponse().size()>0){
 					StringBuffer invoiceNum=new StringBuffer();
 					for(int j=0;j<invoiceNumResult.getResponse().size();j++){
 						if(j==0){
@@ -178,7 +178,7 @@ public class UpdateWriteOffResultProcess extends ProcessTemplate {
 						}else{
 							invoiceNum.append("|").append(invoiceNumResult.getResponse().get(j));
 						}
-					}
+					}*/
 					/*Call Store Procedure*/
 					/*PMSUpdateWriteOff pmsUpdateWriteOffDB =new PMSUpdateWriteOff(context.getLogger());
 					PMSUpdateWriteOffInfoResponse updatePMWriteOff=pmsUpdateWriteOffDB.updateWriteOff(writeOffInfo.getBaNo(),invoiceNum.toString());
@@ -190,9 +190,9 @@ public class UpdateWriteOffResultProcess extends ProcessTemplate {
 					/*Update BA Info*/
 					CLBaInfo baInfoDB = new CLBaInfo(context.getLogger());
 					baInfoDB.updateTreatmentReceive(writeOffInfo.getBaNo(), writeOffDate,writeOffInfo.getWriteOffTypeId(), username,context);
-				}else{
+				/*}else{
 					context.getLogger().info("No Found Invoice Number BA->" +writeOffInfo.getBaNo());
-				}
+				}*/
 			}
 		}
 		else {
